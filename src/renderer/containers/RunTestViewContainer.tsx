@@ -1,22 +1,18 @@
 import { connect } from 'react-redux'
-import { Root } from '../components/Root'
-import { fetchDb, listenForBusybeeMessages } from '../actions';
+import { RunTestView } from '../components/test/RunTestView'
 import { ThunkDispatch } from 'redux-thunk';
 
 ​const mapStateToProps = (state:any) => {
   return {
-    db: state.db,
+    runData: state.timeSeriesTreeTestRunData
   }
 }
 ​
 const mapDispatchToProps = (dispatch:ThunkDispatch<any,any,any>) => {
-  return {
-    fetchDb: () => dispatch(fetchDb()),
-    listenForBusybeeMessages: () => dispatch(listenForBusybeeMessages())
-  }
+  return {}
 }
 ​
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(Root)
+)(RunTestView)

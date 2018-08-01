@@ -4,7 +4,9 @@ require('reflect-metadata');
 import { UserEntity } from '../entities/UserEntity';
 ​import { Connection, getConnectionManager, ConnectionManager, createConnection } from 'typeorm';
 import { Dispatch, AnyAction } from 'redux';
-import { DB_FILE_READY, GET_DB_FILE, WRITE_DB_DATA } from '../../shared/constants/message-types';
+import * as IpcMessageTypes from '../../shared/constants/ipc-message-types';
+import { RunTestConfig } from '../../shared/models/RunTestConfig';
+import { BusybeeMessageI } from '../../shared/models/BusybeeMessageI';
 
 export class ActionTypes {
   static readonly DB_READY = 'DB_READY'; 
@@ -12,14 +14,16 @@ export class ActionTypes {
   static readonly SAVE_USER = 'SAVE_USER';
   static readonly FETCH_USER = 'FETCH_USER';
   static readonly SET_USER = 'SET_USER';
+  static readonly RUN_TEST = 'RUN_TEST';
+  static readonly BUSYBEE_MESSAGE_RECIEVED = 'BUSYBEE_MESSAGE_RECIEVED';
 }
     
 export function fetchDb() {
   return (dispatch:Dispatch<AnyAction>) => {  
     // ask for the db connection
-    ipcRenderer.send(GET_DB_FILE);
+    ipcRenderer.send(IpcMessageTypes.GET_DB_FILE);
     // listen for the db connection
-    ipcRenderer.on(DB_FILE_READY, async (event:any, dbFile:Uint8Array) => {
+    ipcRenderer.on(IpcMessageTypes.DB_FILE_READY, async (event:any, dbFile:Uint8Array) => {
         
         // check for existing connection
         let db:Connection;
@@ -34,7 +38,7 @@ export function fetchDb() {
                 synchronize: true,
                 autoSave: true,
                 autoSaveCallback: async (data: Uint8Array) => {
-                    ipcRenderer.send(WRITE_DB_DATA, data);
+                    ipcRenderer.send(IpcMessageTypes.WRITE_DB_DATA, data);
                 }
             });
         }
@@ -73,4 +77,24 @@ export function saveUser(userForm:any) {
 export const setUser = (user: UserEntity) => ({
   type: ActionTypes.SET_USER,
   payload: user
+});
+
+export function runTest(runTestConfig:RunTestConfig) {
+  return (dispatch:Dispatch<AnyAction>) => {  
+    // ask for the db connection
+    ipcRenderer.send(IpcMessageTypes.RUN_BUSYBEE_TEST, runTestConfig);
+  }
+}
+
+export function listenForBusybeeMessages() {
+  return (dispatch:Dispatch<AnyAction>) => {  
+    ipcRenderer.on(IpcMessageTypes.BUSYBEE_MSG, async (event:any, msg:BusybeeMessageI) => {
+        dispatch(busybeeMessageRecieved(msg));
+    });
+  }
+}
+
+export const busybeeMessageRecieved = (msg: BusybeeMessageI) => ({
+  type: ActionTypes.BUSYBEE_MESSAGE_RECIEVED,
+  payload: msg
 });

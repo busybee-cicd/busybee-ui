@@ -2,17 +2,20 @@ import * as React from 'react';
 import './Root.scss';
 import { SyncLoader } from 'react-spinners';
 import { Connection } from 'typeorm';
-import UserContainer from '../containers/UserContainer';
+import RunTestFormContainer from '../containers/RunTestFormContainer';
+import RunTestViewContainer from '../containers/RunTestViewContainer';
 
 interface RootProps {
     db:Connection,
     fetchDb:Function
+    listenForBusybeeMessages: Function
 }
 
 export class Root extends React.Component<RootProps, any> {
     
     componentDidMount() {
         this.props.fetchDb();
+        this.props.listenForBusybeeMessages();
     }
     
     render(): any {
@@ -24,14 +27,17 @@ export class Root extends React.Component<RootProps, any> {
            );
         } else {
             Content = (
-                <div>
+                <div className="w-100 h-100">
                     <div className="flex-row">
                         <p className='col-sm-12 text-center'>
                             <b>Electron Typescript React Starter</b>  
                         </p>
                     </div>
                     <div className="flex-row">
-                        <UserContainer />
+                        <RunTestFormContainer />
+                    </div>
+                    <div className="flex-row">
+                        <RunTestViewContainer />
                     </div>
                 </div>
             );
