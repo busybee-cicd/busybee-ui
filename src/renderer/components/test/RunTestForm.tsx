@@ -10,15 +10,13 @@ interface RunTestFormProps {
     testDirPath: string;
     wsHost: string;
     wsPort: number;
-    testRunStatus: any;
 }
 
 export class RunTestForm extends React.Component<RunTestFormProps, any> {
     render(){
         return (
-            <div className="message col-sm-12 text-center">
-                <div className='col-sm-6'>
-                    <Formik
+            <div className="message col-sm-6 col-offset-3 text-center">
+                <Formik
                         initialValues={{
                           testDirPath: this.props.testDirPath,
                           wsHost: this.props.wsHost,
@@ -95,10 +93,6 @@ export class RunTestForm extends React.Component<RunTestFormProps, any> {
                             </form>
                         )}
                     />
-                </div>
-                <div className='col-sm-12'>
-                    {JSON.stringify(this.props.testRunStatus, null, '\t')}
-                </div>
             </div>
         )
         

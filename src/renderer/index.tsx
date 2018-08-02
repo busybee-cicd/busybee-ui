@@ -3,12 +3,12 @@ import ReactDOM from 'react-dom';
 import RootContainer from './containers/RootContainer';
 import { Provider } from "react-redux";
 import store from "./store";
+import './assets/css/photon.scss';
+import './assets/css/bootstrap-grid.scss';
 
 let appEl = document.getElementById('app');
 if (appEl) {
-  appEl.classList.add('d-flex');
-  appEl.classList.add('flex-row');
-  appEl.style.height = '100%';
+  appEl.classList.add('window');
 }
 
 const render = (App:any) => {

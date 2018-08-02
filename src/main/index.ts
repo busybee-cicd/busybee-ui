@@ -28,7 +28,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 let mainWindow:BrowserWindow|null;
 
 function createMainWindow() {
-  const window = new BrowserWindow();
+  const window = new BrowserWindow({titleBarStyle: 'hidden'});
   window.setSize(1200,900);
 
   if (isDevelopment) {

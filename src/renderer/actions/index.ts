@@ -5,6 +5,7 @@ import { UserEntity } from '../entities/UserEntity';
 ​import { Connection, getConnectionManager, ConnectionManager, createConnection } from 'typeorm';
 import { Dispatch, AnyAction } from 'redux';
 import * as IpcMessageTypes from '../../shared/constants/ipc-message-types';
+import {NavState} from '../../shared/enums/NavState';
 import { RunTestConfig } from '../../shared/models/RunTestConfig';
 import { BusybeeMessageI } from '../../shared/models/BusybeeMessageI';
 
@@ -16,6 +17,7 @@ export class ActionTypes {
   static readonly SET_USER = 'SET_USER';
   static readonly RUN_TEST = 'RUN_TEST';
   static readonly BUSYBEE_MESSAGE_RECIEVED = 'BUSYBEE_MESSAGE_RECIEVED';
+  static readonly NAVIGATE = 'NAVIGATE';
 }
     
 export function fetchDb() {
@@ -97,4 +99,9 @@ export function listenForBusybeeMessages() {
 export const busybeeMessageRecieved = (msg: BusybeeMessageI) => ({
   type: ActionTypes.BUSYBEE_MESSAGE_RECIEVED,
   payload: msg
+});
+
+export const navigate = (navState: NavState) => ({
+  type: ActionTypes.NAVIGATE,
+  payload: navState
 });
