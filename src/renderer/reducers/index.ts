@@ -9,6 +9,9 @@ let initialTSTreeTestRunData:AnyOfArrays = {};
 const initialState = {
   currentNavState: NavState.RUN_TEST,
   db: null,
+  runTestHistory: [
+    {runId: 1533079149908}, {runId: 1533079149908}, {runId: 1533079149908}, {runId: 1533079149908}
+  ],
   testDirPath: '/Users/simontownsend/dev/busybee/test/IT/fixtures/REST-ws-test',
   timeSeriesTestRunData : initialTSTestRunData,
   timeSeriesTreeTestRunData: initialTSTreeTestRunData,
