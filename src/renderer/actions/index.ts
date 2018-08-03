@@ -8,6 +8,8 @@ import * as IpcMessageTypes from '../../shared/constants/ipc-message-types';
 import {NavState} from '../../shared/enums/NavState';
 import { RunTestConfig } from '../../shared/models/RunTestConfig';
 import { BusybeeMessageI } from '../../shared/models/BusybeeMessageI';
+import { RunTestStatusEntity } from '../entities/RunTestStatusEntity';
+import * as BusybeeMessageTypes from "../../shared/constants/busybee-message-types";
 
 export class ActionTypes {
   static readonly DB_READY = 'DB_READY'; 
@@ -17,6 +19,7 @@ export class ActionTypes {
   static readonly SET_USER = 'SET_USER';
   static readonly RUN_TEST = 'RUN_TEST';
   static readonly BUSYBEE_MESSAGE_RECIEVED = 'BUSYBEE_MESSAGE_RECIEVED';
+  static readonly RUN_TEST_STATUS_RECIEVED = 'RUN_TEST_STATUS_RECIEVED';
   static readonly NAVIGATE = 'NAVIGATE';
 }
     
@@ -36,7 +39,7 @@ export function fetchDb() {
           db = await createConnection({
                 type: 'sqljs',
                 database: dbFile,
-                entities: [UserEntity],
+                entities: [UserEntity, RunTestStatusEntity],
                 synchronize: true,
                 autoSave: true,
                 autoSaveCallback: async (data: Uint8Array) => {
@@ -89,12 +92,39 @@ export function runTest(runTestConfig:RunTestConfig) {
 }
 
 export function listenForBusybeeMessages() {
-  return (dispatch:Dispatch<AnyAction>) => {  
+  return (dispatch:Dispatch<AnyAction>, getState: () =>any) => {  
     ipcRenderer.on(IpcMessageTypes.BUSYBEE_MSG, async (event:any, msg:BusybeeMessageI) => {
-        dispatch(busybeeMessageRecieved(msg));
+      const { db } = getState();
+
+      switch (msg.type) {
+        case BusybeeMessageTypes.TEST_RUN_STATUS:
+          if (!db) {
+            throw Error("no active database connection")
+          }
+          
+          const msgData:any = msg.data;
+          const statusRepo = db.getRepository(RunTestStatusEntity);
+          await statusRepo.save(new RunTestStatusEntity(msgData));
+          const savedStatus: RunTestStatusEntity| undefined = await statusRepo.findOne({
+            runId: msgData.runId,
+            timestamp: msgData.timestamp
+          });
+          if (!savedStatus) {
+            throw Error("no active database connection")
+          }
+          dispatch(runTestStatusRecieved(savedStatus));
+          break;
+        default:
+          dispatch(busybeeMessageRecieved(msg));
+      }
     });
   }
 }
+
+export const runTestStatusRecieved = (status: RunTestStatusEntity) => ({
+  type: ActionTypes.RUN_TEST_STATUS_RECIEVED,
+  payload: status
+});
 
 export const busybeeMessageRecieved = (msg: BusybeeMessageI) => ({
   type: ActionTypes.BUSYBEE_MESSAGE_RECIEVED,
