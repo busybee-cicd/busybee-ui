@@ -84,7 +84,10 @@ app.on('ready', () => {
 /**
  * database
  */
-const databaseFilePath = path.join(app.getPath('userData'), 'databases/starter.db');
+const databaseDir = path.join(app.getPath('userData'), 'databases')
+fs.mkdirsSync(databaseDir);
+const databaseFilePath = path.join(databaseDir, 'starter.db');
+
 ipcMain.on(MessageTypes.GET_DB_FILE, async (event:Event) => {
 
   try {
