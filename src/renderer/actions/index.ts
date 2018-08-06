@@ -2,7 +2,7 @@ const ipcRenderer = require('electron').ipcRenderer;
 // db
 require('reflect-metadata');
 import { UserEntity } from '../entities/UserEntity';
-​import { Connection, getConnectionManager, ConnectionManager, createConnection } from 'typeorm';
+​import { Connection, getConnectionManager, ConnectionManager, createConnection, Repository } from 'typeorm';
 import { Dispatch, AnyAction } from 'redux';
 import * as IpcMessageTypes from '../../shared/constants/ipc-message-types';
 import {NavState} from '../../shared/enums/NavState';
@@ -95,20 +95,19 @@ export function listenForBusybeeMessages() {
   return (dispatch:Dispatch<AnyAction>, getState: () =>any) => {  
     ipcRenderer.on(IpcMessageTypes.BUSYBEE_MSG, async (event:any, msg:BusybeeMessageI) => {
       const { db } = getState();
-
+      
       switch (msg.type) {
         case BusybeeMessageTypes.TEST_RUN_STATUS:
           if (!db) {
             throw Error("no active database connection")
           }
           
-          const msgData:any = msg.data;
-          const statusRepo = db.getRepository(RunTestStatusEntity);
-          await statusRepo.save(new RunTestStatusEntity(msgData));
-          const savedStatus: RunTestStatusEntity| undefined = await statusRepo.findOne({
-            runId: msgData.runId,
-            timestamp: msgData.timestamp
-          });
+          const statusRepo:Repository<RunTestStatusEntity> = db.getRepository(RunTestStatusEntity);
+          const savedStatus = await statusRepo.save(new RunTestStatusEntity(msg));
+          // const savedStatus: RunTestStatusEntity| undefined = await statusRepo.findOne({
+          //   runTimestamp: `${msg.data.runTimestamp}`,
+          //   timestamp: `${msg.timestamp}`
+          // });
           if (!savedStatus) {
             throw Error("no active database connection")
           }

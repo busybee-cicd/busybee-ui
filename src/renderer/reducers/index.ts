@@ -2,6 +2,7 @@ import { ActionTypes } from "../actions";
 import * as _ from "lodash";
 import {NavState} from "../../shared/enums/NavState"
 import { Connection } from "typeorm";
+import { RunTestStatusEntity } from "../entities/RunTestStatusEntity";
 
 let initialTSTestRunData:AnyOfArrays = {};
 let initialTSTreeTestRunData:AnyOfArrays = {};
@@ -24,7 +25,7 @@ const initialState:AppState = {
   runTestHistory: [
     {runId: 1533079149908}, {runId: 1533079149908}, {runId: 1533079149908}, {runId: 1533079149908}
   ],
-  testDirPath: '/Users/simontownsend/dev/busybee/test/IT/fixtures/REST-multi-env',
+  testDirPath: '/Users/212589146/dev/busybee/busybee/test/IT/fixtures/REST-multi-env',
   timeSeriesTestRunData : initialTSTestRunData,
   timeSeriesTreeTestRunData: initialTSTreeTestRunData,
   wsHost: 'localhost',
@@ -48,23 +49,23 @@ const rootReducer = (state = initialState, action:any) => {
     case ActionTypes.RUN_TEST_STATUS_RECIEVED:
       let tsRunDataArr = [];
       let newTsRunData:any = {};
-      let status = action.payload;
-      let runId = status.runId.getTime();
-      if (state.timeSeriesTestRunData[runId]) {
-        tsRunDataArr = state.timeSeriesTestRunData[runId].slice();
+      let status:RunTestStatusEntity = action.payload;
+      let runTimestamp = status.runTimestamp.getTime();
+      if (state.timeSeriesTestRunData[runTimestamp]) {
+        tsRunDataArr = state.timeSeriesTestRunData[runTimestamp].slice();
         newTsRunData = Object.assign({}, state.timeSeriesTestRunData);
       }
       tsRunDataArr.push(status.data);
-      newTsRunData[runId] = tsRunDataArr;
+      newTsRunData[runTimestamp] = tsRunDataArr;
       
       let tsTreeRunDataArr = [];
       let newTsTreeRunData:any = {};
-      if (state.timeSeriesTreeTestRunData[runId]) {
-        tsTreeRunDataArr = state.timeSeriesTreeTestRunData[runId].slice();
+      if (state.timeSeriesTreeTestRunData[runTimestamp]) {
+        tsTreeRunDataArr = state.timeSeriesTreeTestRunData[runTimestamp].slice();
         newTsTreeRunData = Object.assign({}, state.timeSeriesTreeTestRunData);
       }
       tsTreeRunDataArr.push(buildTreeTestRunData(status.data));
-      newTsTreeRunData[runId] = tsTreeRunDataArr;
+      newTsTreeRunData[runTimestamp] = tsTreeRunDataArr;
       
       return set(
         state, 
@@ -85,9 +86,10 @@ const buildTreeTestRunData = (testRunStatus:any) => {
   
   const hosts:any[] = [];
   const treeData = {
-    name: `${testRunStatus.runId}`,
+    name: `${testRunStatus.runTimestamp}`,
     attributes: {
-      timestamp: `${new Date(testRunStatus.timestamp).toUTCString()}`
+      runId: testRunStatus.runId,
+      timestamp: `${new Date(testRunStatus.runTimestamp).toUTCString()}`,
     },
     children: hosts
   };

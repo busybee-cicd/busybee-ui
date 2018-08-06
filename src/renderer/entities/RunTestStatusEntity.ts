@@ -1,4 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm';
+import { BusybeeMessageI } from '../../shared/models/BusybeeMessageI';
  
 @Entity()
 export class RunTestStatusEntity {
@@ -6,26 +7,24 @@ export class RunTestStatusEntity {
     @PrimaryGeneratedColumn()
     id!: number;
     
-    @Column("date")
-    runId!: Date
- 
     @Column("datetime")
-    timestamp!: Date
-    
-    @Column({
-      type: "clob", 
-      transformer: { 
-        to: (input:any) => { JSON.stringify(input); }, 
-        from: (out:string) => { JSON.parse(out); }
-      }
-    })
+    timestamp!: Date // timestamp of when the message was recieved
+
+    @Column("datetime") // timestamp of when the test run was started (unique)
+    runTimestamp!: Date
+
+    @Column()
+    runId!: string
+ 
+    @Column("simple-json")
     data!: any
     
-    constructor(status:any | null) {
-      if (!status) { return }
+    constructor(msg:BusybeeMessageI) {
+      if (!msg) { return }
       
-      this.runId = status.runId;
-      this.timestamp = new Date(status.timestamp);
-      this.data = status;
+      this.timestamp = new Date(msg.timestamp);
+      this.runTimestamp = new Date(msg.data.runTimestamp);
+      this.runId = msg.data.runId;
+      this.data = msg.data;
     }
 }

@@ -172,7 +172,7 @@ function busybeeTest(runConfig:RunTestConfig) {
     let lines = IOUtil.parseDataBuffer(data);
     lines.forEach((l) => {
       logger.debug(l);
-      if (l.startsWith(`INFO: wss running at ${runConfig.wsConnectionInfo.port}`)) {
+      if (l.startsWith(`INFO:TestWebSocketServer: wss running at ${runConfig.wsConnectionInfo.port}`)) {
         initWs(runConfig.wsConnectionInfo);
       }
     })
