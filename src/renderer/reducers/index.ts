@@ -123,8 +123,6 @@ const buildTreeTestRunData = (testRunStatus:any) => {
       children: environments
     });
     
-    
-    // add each environment to each host
   });
   
   return treeData;
