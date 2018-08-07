@@ -1,7 +1,5 @@
-# electron-typescript-react-starter
-> a custom configuration of https://github.com/electron-userland/electron-webpack-quick-start with [typeorm](https://github.com/typeorm/typeorm) via [sql.js](https://github.com/kripken/sql.js/) for portability, [react-redux](https://github.com/reduxjs/react-redux) for state-management, and [formik](https://github.com/jaredpalmer/formik) for form-building. enjoy
-
-Make sure to check out [`electron-webpack`'s documentation](https://webpack.electron.build/) for available plugins and add-ons.
+# busybee-ui
+> Spy on the hive in real time, view results and your Run History
 
 ## Quickstart
 ```
