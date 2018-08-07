@@ -1,4 +1,4 @@
 export enum NavState {
-  RUN_TEST,
+  TEST_RUN,
   LIVE_VIEW
 }

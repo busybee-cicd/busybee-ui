@@ -3,8 +3,9 @@ import { Root } from '../components/Root'
 import { fetchDb, listenForBusybeeMessages, navigate } from '../actions';
 import { ThunkDispatch } from 'redux-thunk';
 import { NavState } from '../../shared/enums/NavState';
+import { AppState } from '../reducers';
 
-​const mapStateToProps = (state:any) => {
+​const mapStateToProps = (state:AppState) => {
   return {
     db: state.db,
     navState: state.currentNavState

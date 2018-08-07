@@ -8,7 +8,7 @@ import * as MessageTypes from '../shared/constants/ipc-message-types';
 import * as fs from 'fs-extra';
 import * as WebSocket from 'ws';
 import { WSConnectionInfo } from '../shared/models/WSConnectionInfo';
-import { RunTestConfig } from '../shared/models/RunTestConfig';
+import { TestRunConfig } from '../shared/models/TestRunConfig';
 import { spawn } from 'child_process';
 import { IOUtil, Logger, LoggerConf } from 'busybee-util';
 
@@ -84,7 +84,10 @@ app.on('ready', () => {
 /**
  * database
  */
-const databaseFilePath = path.join(app.getPath('userData'), 'databases/starter.db');
+const databaseDir = path.join(app.getPath('userData'), 'databases')
+fs.mkdirsSync(databaseDir);
+const databaseFilePath = path.join(databaseDir, 'starter.db');
+
 ipcMain.on(MessageTypes.GET_DB_FILE, async (event:Event) => {
 
   try {
@@ -111,7 +114,7 @@ ipcMain.on(MessageTypes.WRITE_DB_DATA, (event:Event, dbData:Uint8Array) => {
 });
 
 // Busybee CMDLine events
-ipcMain.on(MessageTypes.RUN_BUSYBEE_TEST, (event: Event, runConfig:RunTestConfig) => {
+ipcMain.on(MessageTypes.RUN_BUSYBEE_TEST, (event: Event, runConfig:TestRunConfig) => {
   busybeeTest(runConfig);
 });
 
@@ -153,7 +156,7 @@ function initWs(connectionInfo:WSConnectionInfo|null): WebSocket {
 }
 
 
-function busybeeTest(runConfig:RunTestConfig) {
+function busybeeTest(runConfig:TestRunConfig) {
   logger.debug('busybeeTest')
   // run busybee
   const runCmd  = spawn('busybee', ['test', '-d', runConfig.dirPath, '-w', `${runConfig.wsConnectionInfo.port}`]);
@@ -169,7 +172,7 @@ function busybeeTest(runConfig:RunTestConfig) {
     let lines = IOUtil.parseDataBuffer(data);
     lines.forEach((l) => {
       logger.debug(l);
-      if (l.startsWith(`INFO: wss running at ${runConfig.wsConnectionInfo.port}`)) {
+      if (l.startsWith(`INFO:TestWebSocketServer: wss running at ${runConfig.wsConnectionInfo.port}`)) {
         initWs(runConfig.wsConnectionInfo);
       }
     })

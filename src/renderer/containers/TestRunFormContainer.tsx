@@ -1,25 +1,25 @@
 import { connect } from 'react-redux'
-import { RunTestForm } from '../components/test/RunTestForm'
+import { TestRunForm } from '../components/test/TestRunForm'
 import { runTest } from '../actions';
 import { ThunkDispatch } from 'redux-thunk';
-import { RunTestConfig } from '../../shared/models/RunTestConfig';
+import { TestRunConfig } from '../../shared/models/TestRunConfig';
+import { AppState } from '../reducers';
 
-​const mapStateToProps = (state:any) => {
+​const mapStateToProps = (state:AppState) => {
   return {
     testDirPath: state.testDirPath,
     wsHost: state.wsHost,
-    wsPort: state.wsPort,
-    testRunStatus: state.testRunStatus
+    wsPort: state.wsPort
   }
 }
 ​
 const mapDispatchToProps = (dispatch:ThunkDispatch<any,any,any>) => {
   return {
-    runTest: (runTestConfig:RunTestConfig) => dispatch(runTest(runTestConfig))
+    runTest: (runTestConfig:TestRunConfig) => dispatch(runTest(runTestConfig))
   }
 }
 ​
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(RunTestForm)
+)(TestRunForm)

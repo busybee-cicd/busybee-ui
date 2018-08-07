@@ -2,12 +2,16 @@ const ipcRenderer = require('electron').ipcRenderer;
 // db
 require('reflect-metadata');
 import { UserEntity } from '../entities/UserEntity';
-​import { Connection, getConnectionManager, ConnectionManager, createConnection } from 'typeorm';
+​import { Connection, getConnectionManager, ConnectionManager, createConnection, Repository } from 'typeorm';
 import { Dispatch, AnyAction } from 'redux';
 import * as IpcMessageTypes from '../../shared/constants/ipc-message-types';
 import {NavState} from '../../shared/enums/NavState';
-import { RunTestConfig } from '../../shared/models/RunTestConfig';
+import { TestRunConfig } from '../../shared/models/TestRunConfig';
 import { BusybeeMessageI } from '../../shared/models/BusybeeMessageI';
+import { TestRunStatusEntity } from '../entities/TestRunStatusEntity';
+import * as BusybeeMessageTypes from "../../shared/constants/busybee-message-types";
+import { TestRunResultEntity } from '../entities/TestRunResultEntity';
+import { AppState } from '../reducers';
 
 export class ActionTypes {
   static readonly DB_READY = 'DB_READY'; 
@@ -16,9 +20,22 @@ export class ActionTypes {
   static readonly FETCH_USER = 'FETCH_USER';
   static readonly SET_USER = 'SET_USER';
   static readonly RUN_TEST = 'RUN_TEST';
+  static readonly SET_CURRENT_TEST_RUN_ID = 'SET_CURRENT_TEST_RUN_ID';
   static readonly BUSYBEE_MESSAGE_RECIEVED = 'BUSYBEE_MESSAGE_RECIEVED';
+  static readonly TEST_RUN_STATUS_RECIEVED = 'TEST_RUN_STATUS_RECIEVED';
+  static readonly TEST_RUN_RESULT_RECIEVED = 'TEST_RUN_RESULT_RECIEVED';
   static readonly NAVIGATE = 'NAVIGATE';
+  static readonly FETCH_TEST_RUN_HISTORY = 'FETCH_TEST_RUN_HISTROY';
+  static readonly TEST_RUN_HISTORY_RECIEVED = 'TEST_RUN_HISTORY_RECIEVED';
+  static readonly SET_TIME_SERIES_RUN_DATA = 'SET_TIME_SERIES_RUN_DATA';
+  static readonly SET_TEST_RUN_VIEW_SLIDER_INDEX = 'SET_TEST_RUN_VIEW_SLIDER_INDEX';
 }
+
+const entities = [
+  UserEntity,
+  TestRunStatusEntity,
+  TestRunResultEntity
+];
     
 export function fetchDb() {
   return (dispatch:Dispatch<AnyAction>) => {  
@@ -36,7 +53,7 @@ export function fetchDb() {
           db = await createConnection({
                 type: 'sqljs',
                 database: dbFile,
-                entities: [UserEntity],
+                entities: entities,
                 synchronize: true,
                 autoSave: true,
                 autoSaveCallback: async (data: Uint8Array) => {
@@ -55,46 +72,81 @@ export const dbReady = (db:Connection) => ({
   payload: db
 });
 
-export function fetchUser() {
-  return async (dispatch:Dispatch<AnyAction>, getState:()=>any) => {
-    const { db } = getState();
-    const userRepo = db.getRepository(UserEntity);
-    const user = await userRepo.findOne(1);
-    dispatch(setUser(user));
-  }
-}
-
-export function saveUser(userForm:any) {
-  return async (dispatch:Dispatch<AnyAction>, getState:()=>any) => {  
-    const { db } = getState();
-    const userRepo = db.getRepository(UserEntity);
-    const user = new UserEntity(userForm);
-    await userRepo.save(user);
-    
-    const savedUser = await userRepo.findOne({name: user.name});
-    dispatch(setUser(savedUser));
-  }
-}
-
 export const setUser = (user: UserEntity) => ({
   type: ActionTypes.SET_USER,
   payload: user
 });
 
-export function runTest(runTestConfig:RunTestConfig) {
-  return (dispatch:Dispatch<AnyAction>) => {  
+export function runTest(runTestConfig:TestRunConfig) {
+  return (dispatch:Dispatch<any>) => {  
     // ask for the db connection
     ipcRenderer.send(IpcMessageTypes.RUN_BUSYBEE_TEST, runTestConfig);
+    dispatch(setCurrentTestRunId(null));
+    dispatch(navigate(NavState.LIVE_VIEW));
   }
 }
 
 export function listenForBusybeeMessages() {
-  return (dispatch:Dispatch<AnyAction>) => {  
+  return (dispatch:Dispatch<any>, getState: () => AppState) => {  
     ipcRenderer.on(IpcMessageTypes.BUSYBEE_MSG, async (event:any, msg:BusybeeMessageI) => {
-        dispatch(busybeeMessageRecieved(msg));
+      const { db } = getState();
+      if (!db) {
+        throw Error("no active database connection")
+      }
+
+      switch (msg.type) {
+        case BusybeeMessageTypes.TEST_RUN_STATUS:
+          const statusRepo:Repository<TestRunStatusEntity> = db.getRepository(TestRunStatusEntity);
+          const savedStatus = await statusRepo.save(new TestRunStatusEntity(msg));
+          if (!savedStatus) {
+            throw Error("error when saving status!")
+          }
+          dispatch(testRunStatusRecieved(savedStatus));
+          break;
+        case BusybeeMessageTypes.TEST_RUN_RESULT:
+          const resultRepo:Repository<TestRunResultEntity> = db.getRepository(TestRunResultEntity);
+          const savedResult = await resultRepo.save(new TestRunStatusEntity(msg));
+          if (!savedResult) {
+            throw Error("error when saving result!")
+          }
+          dispatch(fetchTestRunHistory());
+          dispatch(testRunResultRecieved(savedResult));
+        break;
+        default:
+          dispatch(busybeeMessageRecieved(msg));
+      }
     });
   }
 }
+
+export function fetchTestRunHistory() {
+  return async (dispatch:Dispatch<AnyAction>, getState:() => AppState) => {  
+    const { db } = getState();
+    if (!db) {
+      throw Error("no active database connection")
+    }
+
+    const statusRepo:Repository<TestRunStatusEntity> = db.getRepository(TestRunStatusEntity);
+    const orderedHistory:TestRunStatusEntity[] = await
+      statusRepo
+        .createQueryBuilder("status")
+        .groupBy("status.runTimestamp")
+        .orderBy("status.runTimestamp", "ASC")
+        .getMany()
+            
+    dispatch(testRunHistoryRecieved(orderedHistory));
+  }
+}
+
+export const testRunStatusRecieved = (status: TestRunStatusEntity) => ({
+  type: ActionTypes.TEST_RUN_STATUS_RECIEVED,
+  payload: status
+});
+
+export const testRunResultRecieved = (result: any) => ({
+  type: ActionTypes.TEST_RUN_RESULT_RECIEVED,
+  payload: result
+});
 
 export const busybeeMessageRecieved = (msg: BusybeeMessageI) => ({
   type: ActionTypes.BUSYBEE_MESSAGE_RECIEVED,
@@ -104,4 +156,48 @@ export const busybeeMessageRecieved = (msg: BusybeeMessageI) => ({
 export const navigate = (navState: NavState) => ({
   type: ActionTypes.NAVIGATE,
   payload: navState
+});
+
+export const testRunHistoryRecieved = (history: TestRunStatusEntity[]) => ({
+  type: ActionTypes.TEST_RUN_HISTORY_RECIEVED,
+  payload: history
+});
+
+export function setCurrentTestRunId(runId: string | null) {
+  return async (dispatch:Dispatch<AnyAction>, getState:() => AppState) => {
+    const { db, timeSeriesTestRunData } = getState();
+    if (!db) {
+      throw Error("no active database connection")
+    }
+
+    if (runId != null && !timeSeriesTestRunData[runId]) {
+      // we need to populate this run's data into the timeSeriesTestRunData
+      const statusRepo:Repository<TestRunStatusEntity> = db.getRepository(TestRunStatusEntity);
+      const orderedRunData:TestRunStatusEntity[] = await
+      statusRepo
+        .createQueryBuilder("status")
+        .where(`status.runId = "${runId}"`)
+        .orderBy("status.timestamp", "ASC")
+        .getMany()
+
+      timeSeriesTestRunData[runId] = orderedRunData;
+    }
+    dispatch(setTimeSeriesRunData(timeSeriesTestRunData));
+    dispatch(currentTestRunIdSet(runId))
+  }
+}
+
+export const currentTestRunIdSet = (id: string | null) => ({
+  type: ActionTypes.SET_CURRENT_TEST_RUN_ID,
+  payload: id
+});
+
+export const setTimeSeriesRunData = (data:AnyOfArrays) => ({
+  type: ActionTypes.SET_TIME_SERIES_RUN_DATA,
+  payload: data
+});
+
+export const setTestRunViewSliderIndex = (index:number) => ({
+  type: ActionTypes.SET_TEST_RUN_VIEW_SLIDER_INDEX,
+  payload: index
 });

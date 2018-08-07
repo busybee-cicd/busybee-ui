@@ -2,17 +2,17 @@ import * as React from 'react';
 import './RunTestForm.scss';
 
 import { Formik } from 'formik';
-import { RunTestConfig } from '../../../shared/models/RunTestConfig';
+import { TestRunConfig } from '../../../shared/models/TestRunConfig';
 import { WSConnectionInfo } from '../../../shared/models/WSConnectionInfo';
 
-interface RunTestFormProps {
-    runTest: (runTestConfig:RunTestConfig) => {};
+interface TestRunFormProps {
+    runTest: (runTestConfig:TestRunConfig) => void;
     testDirPath: string;
     wsHost: string;
     wsPort: number;
 }
 
-export class RunTestForm extends React.Component<RunTestFormProps, any> {
+export class TestRunForm extends React.Component<TestRunFormProps, any> {
     render(){
         return (
             <div className="message col-sm-6 col-offset-3 text-center">
@@ -35,7 +35,7 @@ export class RunTestForm extends React.Component<RunTestFormProps, any> {
                             { setSubmitting, setErrors }
                         ) => {
                             const wsConnection = new WSConnectionInfo(values.wsHost, values.wsPort);
-                            const runConfig = new RunTestConfig(values.testDirPath, wsConnection);
+                            const runConfig = new TestRunConfig(values.testDirPath, wsConnection);
                             this.props.runTest(runConfig);
                         }}
                         render={({

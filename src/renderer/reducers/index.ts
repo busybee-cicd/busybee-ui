@@ -1,20 +1,30 @@
 import { ActionTypes } from "../actions";
-import * as BusybeeMessageTypes from "../../shared/constants/busybee-message-types";
-import * as _ from "lodash";
-import {NavState} from "../../shared/enums/NavState"
+import { NavState } from "../../shared/enums/NavState"
+import { Connection } from "typeorm";
+import { TestRunStatusEntity } from "../entities/TestRunStatusEntity";
 
 let initialTSTestRunData:AnyOfArrays = {};
-let initialTSTreeTestRunData:AnyOfArrays = {};
 
-const initialState = {
-  currentNavState: NavState.RUN_TEST,
+export interface AppState {
+  currentNavState: NavState,
+  currentTestRunId: string | null,
+  db: Connection | null,
+  runViewSliderIndex: number,
+  testRunHistory: any[],
+  testDirPath: string,
+  timeSeriesTestRunData: AnyOfArrays,
+  wsHost: string,
+  wsPort: number
+}
+
+const initialState:AppState = {
+  currentNavState: NavState.TEST_RUN,
+  currentTestRunId: null,
   db: null,
-  runTestHistory: [
-    {runId: 1533079149908}, {runId: 1533079149908}, {runId: 1533079149908}, {runId: 1533079149908}
-  ],
-  testDirPath: '/Users/simontownsend/dev/busybee/test/IT/fixtures/REST-ws-test',
+  runViewSliderIndex: 0,
+  testRunHistory: [],
+  testDirPath: '/Users/212589146/dev/busybee/busybee/test/IT/fixtures/REST-multi-env',
   timeSeriesTestRunData : initialTSTestRunData,
-  timeSeriesTreeTestRunData: initialTSTreeTestRunData,
   wsHost: 'localhost',
   wsPort: 8080
 };
@@ -30,93 +40,49 @@ const rootReducer = (state = initialState, action:any) => {
       return set(state, {user: action.payload});
     case ActionTypes.BUSYBEE_MESSAGE_RECIEVED:
       switch (action.payload.type) {
-        case BusybeeMessageTypes.TEST_RUN_STATUS:
-          let msgData:any = action.payload.data;
-
-          let tsRunDataArr = [];
-          let newTsRunData:any = {};
-          if (state.timeSeriesTestRunData[msgData.runId]) {
-            tsRunDataArr = state.timeSeriesTestRunData[msgData.runId].slice();
-            newTsRunData = Object.assign({}, state.timeSeriesTestRunData);
-          }
-          tsRunDataArr.push(action.payload.data);
-          newTsRunData[msgData.runId] = tsRunDataArr;
-          
-          let tsTreeRunDataArr = [];
-          let newTsTreeRunData:any = {};
-          if (state.timeSeriesTreeTestRunData[msgData.runId]) {
-            tsTreeRunDataArr = state.timeSeriesTreeTestRunData[msgData.runId].slice();
-            newTsTreeRunData = Object.assign({}, state.timeSeriesTreeTestRunData);
-          }
-          tsTreeRunDataArr.push(buildTreeTestRunData(action.payload.data));
-          newTsTreeRunData[msgData.runId] = tsTreeRunDataArr;
-          
-          return set(
-            state, 
-            {
-              timeSeriesTestRunData: newTsRunData, 
-              timeSeriesTreeTestRunData: newTsTreeRunData
-            }
-          );
         default:
           return state;
       }
+    case ActionTypes.SET_CURRENT_TEST_RUN_ID:
+      return set(state, {currentTestRunId: action.payload});
+    case ActionTypes.TEST_RUN_STATUS_RECIEVED:
+      let tsRunDataArr = [];
+      let newTsRunData:any = {};
+      let status:TestRunStatusEntity = action.payload;
+      let runId = status.runId;
+      if (state.timeSeriesTestRunData[runId]) {
+        tsRunDataArr = state.timeSeriesTestRunData[runId].slice();
+        newTsRunData = Object.assign({}, state.timeSeriesTestRunData);
+      }
+      tsRunDataArr.push(status);
+      newTsRunData[runId] = tsRunDataArr;
+      
+      let updateState:any = {
+        timeSeriesTestRunData: newTsRunData,
+      };
+  
+      if (state.currentTestRunId === null) {
+        // ensure that if this is a fresh run that it is displayed in the UI
+        updateState.currentTestRunId = status.runId;
+      }
+
+      updateState.runViewSliderIndex = tsRunDataArr.length - 1;
+
+      return set(state, updateState);
+    case ActionTypes.TEST_RUN_RESULT_RECIEVED:
+      console.log('TEST_RUN_RESULT_RECIEVED')
+      return state;
+    case ActionTypes.SET_TIME_SERIES_RUN_DATA:
+      return set(state, {timeSeriesTestRunData: action.payload})
+    case ActionTypes.TEST_RUN_HISTORY_RECIEVED:
+      return set(state, {testRunHistory: action.payload})
+    case ActionTypes.SET_TEST_RUN_VIEW_SLIDER_INDEX:
+      return set(state, {runViewSliderIndex: action.payload})
     case ActionTypes.NAVIGATE:
       return set(state, {currentNavState: action.payload})
     default:
       return state;
   }
 };
-
-
-const buildTreeTestRunData = (testRunStatus:any) => {
-  
-  const hosts:any[] = [];
-  const treeData = {
-    name: `${testRunStatus.runId}`,
-    attributes: {
-      timestamp: `${new Date(testRunStatus.timestamp).toUTCString()}`
-    },
-    children: hosts
-  };
-  
-  _.forEach(testRunStatus.hosts, (hostData, hostName) => {
-    
-    // get en
-    const environments:any[] = [];
-    _.forEach(hostData.envs, (hostEnvData, envId) => {
-      const envData = testRunStatus.envs[envId];
-      const testSets:string[] = _.map(envData.testSets, (data:any, testSetName) => {
-        return testSetName;
-      });
-      let portOffset:number = hostEnvData.portOffset;
-      const ports:number[] = hostEnvData.ports.map((p:number) => { return p + portOffset });
-      environments.push({
-        name: envData.suiteEnvID,
-        attributes: {
-          suiteID: envData.suiteID,
-          testSets: testSets,
-          ports: ports
-        }
-      });
-    });
-    
-    // add each host
-    treeData.children.push({
-      name: hostName,
-      attributes: {
-        load: hostData.load,
-        capacity: hostData.capacity
-      },
-      children: environments
-    });
-    
-    
-    // add each environment to each host
-  });
-  
-  return treeData;
-};
-
 
 export default rootReducer;
