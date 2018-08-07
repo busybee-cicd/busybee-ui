@@ -2,7 +2,7 @@ import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm';
 import { BusybeeMessageI } from '../../shared/models/BusybeeMessageI';
  
 @Entity()
-export class RunTestStatusEntity {
+export class TestRunResultEntity {
  
     @PrimaryGeneratedColumn()
     id!: number;

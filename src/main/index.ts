@@ -8,7 +8,7 @@ import * as MessageTypes from '../shared/constants/ipc-message-types';
 import * as fs from 'fs-extra';
 import * as WebSocket from 'ws';
 import { WSConnectionInfo } from '../shared/models/WSConnectionInfo';
-import { RunTestConfig } from '../shared/models/RunTestConfig';
+import { TestRunConfig } from '../shared/models/TestRunConfig';
 import { spawn } from 'child_process';
 import { IOUtil, Logger, LoggerConf } from 'busybee-util';
 
@@ -114,7 +114,7 @@ ipcMain.on(MessageTypes.WRITE_DB_DATA, (event:Event, dbData:Uint8Array) => {
 });
 
 // Busybee CMDLine events
-ipcMain.on(MessageTypes.RUN_BUSYBEE_TEST, (event: Event, runConfig:RunTestConfig) => {
+ipcMain.on(MessageTypes.RUN_BUSYBEE_TEST, (event: Event, runConfig:TestRunConfig) => {
   busybeeTest(runConfig);
 });
 
@@ -156,7 +156,7 @@ function initWs(connectionInfo:WSConnectionInfo|null): WebSocket {
 }
 
 
-function busybeeTest(runConfig:RunTestConfig) {
+function busybeeTest(runConfig:TestRunConfig) {
   logger.debug('busybeeTest')
   // run busybee
   const runCmd  = spawn('busybee', ['test', '-d', runConfig.dirPath, '-w', `${runConfig.wsConnectionInfo.port}`]);

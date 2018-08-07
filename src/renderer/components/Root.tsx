@@ -2,17 +2,17 @@ import * as React from 'react';
 import './Root.scss';
 import { SyncLoader } from 'react-spinners';
 import { Connection } from 'typeorm';
-import RunTestFormContainer from '../containers/RunTestFormContainer';
-import RunTestViewContainer from '../containers/RunTestViewContainer';
+import TestRunFormContainer from '../containers/TestRunFormContainer';
+import TestRunViewContainer from '../containers/TestRunViewContainer';
 import {NavState} from '../../shared/enums/NavState';
 import * as classnames from 'classnames';
 
 interface RootProps {
-    db:Connection,
+    db:Connection|null,
     navState:NavState,
-    fetchDb: () => {},
-    listenForBusybeeMessages: () => {},
-    navigate: (state:NavState) => {}
+    fetchDb: () => void,
+    listenForBusybeeMessages: () => void,
+    navigate: (state:NavState) => void
 }
 
 export class Root extends React.Component<RootProps, any> {
@@ -28,7 +28,7 @@ export class Root extends React.Component<RootProps, any> {
     
     render(): any {
         let Content;
-        let runTestBtnClasses = classnames('btn btn-default', {'active': this.props.navState === NavState.RUN_TEST});
+        let runTestBtnClasses = classnames('btn btn-default', {'active': this.props.navState === NavState.TEST_RUN});
         let liveViewBtnClasses = classnames('btn btn-default', {'active': this.props.navState === NavState.LIVE_VIEW});
         
         if (!this.props.db) {
@@ -37,15 +37,14 @@ export class Root extends React.Component<RootProps, any> {
                 loading={true} />
            );
         } else {
+            Content = <TestRunFormContainer />;
             switch (this.props.navState) {
-                case NavState.RUN_TEST:
-                    Content = <RunTestFormContainer />;
+                case NavState.TEST_RUN:
                     break;
                 case NavState.LIVE_VIEW:
-                    Content = <RunTestViewContainer />;
+                    Content = <TestRunViewContainer />;
                     break;
                 default:
-                    Content = <RunTestFormContainer />;
                     break;
             }
         }
@@ -56,7 +55,7 @@ export class Root extends React.Component<RootProps, any> {
                     <h1 className="title">Busybee UI</h1>
                     <div className="toolbar-actions">
                         <div className="btn-group">
-                            <button className={runTestBtnClasses} onClick={this.handleNavigate.bind(this, NavState.RUN_TEST)}>
+                            <button className={runTestBtnClasses} onClick={this.handleNavigate.bind(this, NavState.TEST_RUN)}>
                                 <span className="icon icon-shuffle icon-text"></span>
                                 Run Test
                             </button>

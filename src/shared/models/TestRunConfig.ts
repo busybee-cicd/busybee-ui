@@ -1,6 +1,6 @@
 import { WSConnectionInfo } from "./WSConnectionInfo";
 
-export class RunTestConfig {
+export class TestRunConfig {
   dirPath:string = '';
   wsConnectionInfo: WSConnectionInfo = new WSConnectionInfo('localhost', 8080);
   
