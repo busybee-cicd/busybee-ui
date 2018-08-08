@@ -15,14 +15,14 @@ const initialAppState:AppState = {
 
 export default (state:AppState = initialAppState, action:ReducerAction):AppState => {
     switch (action.type) {
-        case ActionTypes.DB_READY:
+        case ActionTypes.app.DB_READY:
             return set(state, {db: action.payload});
-        case ActionTypes.BUSYBEE_MESSAGE_RECIEVED:
+        case ActionTypes.app.BUSYBEE_MESSAGE_RECIEVED:
             switch (action.payload.type) {
                 default:
                 return state;
             }
-        case ActionTypes.NAVIGATE:
+        case ActionTypes.app.NAVIGATE:
             return set(state, {currentNavLocation: action.payload})
         default:
             return state;

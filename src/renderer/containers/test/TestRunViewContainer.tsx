@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import TestRunView from '../../components/test/TestRunView'
 import { ThunkDispatch } from 'redux-thunk';
 import { RootState } from '../../reducers';
-import { setTestRunViewSliderIndex } from '../../actions';
+import { Actions } from '../../actions';
 
 ​const mapStateToProps = (state:RootState) => {
   return {
@@ -15,7 +15,7 @@ import { setTestRunViewSliderIndex } from '../../actions';
 ​
 const mapDispatchToProps = (dispatch:ThunkDispatch<any,any,any>) => {
   return {
-    setTestRunViewSliderIndex: (index:number) => {dispatch(setTestRunViewSliderIndex(index)); }
+    setTestRunViewSliderIndex: (index:number) => {dispatch(Actions.testRun.setTestRunViewSliderIndex(index)); }
   }
 }
 ​

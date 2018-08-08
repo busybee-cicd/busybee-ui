@@ -26,9 +26,9 @@ const initialTestRunState:TestRunState = {
 
 export default (state:TestRunState = initialTestRunState, action:ReducerAction):TestRunState => {
     switch (action.type) {
-        case ActionTypes.SET_CURRENT_TEST_RUN_ID:
+        case ActionTypes.testRun.SET_CURRENT_TEST_RUN_ID:
             return set(state, {currentRunId: action.payload, sliderIndex: 0});
-        case ActionTypes.TEST_RUN_STATUS_RECIEVED:
+        case ActionTypes.testRun.TEST_RUN_STATUS_RECIEVED:
             let tsRunDataArr = [];
             let newTsRunData:any = {};
             let status:TestRunStatusEntity = action.payload;
@@ -51,18 +51,18 @@ export default (state:TestRunState = initialTestRunState, action:ReducerAction):
             }
 
             return set(state, updateState);
-        case ActionTypes.TEST_RUN_RESULT_RECIEVED:
+        case ActionTypes.testRun.TEST_RUN_RESULT_RECIEVED:
             console.log('TEST_RUN_RESULT_RECIEVED')
             return state;
-        case ActionTypes.SET_TIME_SERIES_RUN_DATA:
+        case ActionTypes.testRun.SET_TIME_SERIES_RUN_DATA:
             return set(state, {timeSeriesData: action.payload});
-        case ActionTypes.TEST_RUN_HISTORY_RECIEVED:
+        case ActionTypes.testRun.TEST_RUN_HISTORY_RECIEVED:
             return set(state, {history: action.payload});
-        case ActionTypes.SET_TEST_RUN_VIEW_SLIDER_INDEX:
+        case ActionTypes.testRun.SET_TEST_RUN_VIEW_SLIDER_INDEX:
             return set(state, {sliderIndex: action.payload});
-        case ActionTypes.SET_REMOTE_CONNECT:
+        case ActionTypes.testRun.SET_REMOTE_CONNECT:
             return set(state, {remoteConnect: action.payload})
-        case ActionTypes.SET_IS_RUNNING:
+        case ActionTypes.testRun.SET_IS_RUNNING:
             return set(state, {isRunning: action.payload})
         default:
             return state;
