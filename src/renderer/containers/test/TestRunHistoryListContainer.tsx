@@ -1,8 +1,8 @@
 import { connect } from 'react-redux'
-import { TestRunHistoryList } from '../components/test/TestRunHistoryList'
+import { TestRunHistoryList } from '../../components/test/TestRunHistoryList'
 import { ThunkDispatch } from 'redux-thunk';
-import { fetchTestRunHistory, setCurrentTestRunId } from '../actions';
-import { RootState } from '../reducers';
+import { fetchTestRunHistory, setCurrentTestRunId } from '../../actions';
+import { RootState } from '../../reducers';
 
 ​const mapStateToProps = (state:RootState) => {
   return {

@@ -8,7 +8,7 @@ interface TestRunTreeProps {
     dataIndex: number;
 }
 
-export class TestRunTree extends React.Component<TestRunTreeProps, any> {
+export default class TestRunTree extends React.Component<TestRunTreeProps, any> {
         
     render() {
         let dataArr = this.props.runData[this.props.runId];
@@ -16,7 +16,7 @@ export class TestRunTree extends React.Component<TestRunTreeProps, any> {
         
         return (
             <div id={data.runId} className="w-100 h-100">
-                <Tree 
+                <Tree
                     data={[data]} 
                     orientation='vertical'
                     translate={{

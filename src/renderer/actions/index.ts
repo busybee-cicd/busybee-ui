@@ -12,6 +12,7 @@ import { TestRunStatusEntity } from '../entities/TestRunStatusEntity';
 import * as BusybeeMessageTypes from "../../shared/constants/busybee-message-types";
 import { TestRunResultEntity } from '../entities/TestRunResultEntity';
 import { RootState } from '../reducers';
+import { WSConnectionInfo } from '../../shared/models/WSConnectionInfo';
 
 export class ActionTypes {
   static readonly DB_READY = 'DB_READY'; 
@@ -29,6 +30,8 @@ export class ActionTypes {
   static readonly TEST_RUN_HISTORY_RECIEVED = 'TEST_RUN_HISTORY_RECIEVED';
   static readonly SET_TIME_SERIES_RUN_DATA = 'SET_TIME_SERIES_RUN_DATA';
   static readonly SET_TEST_RUN_VIEW_SLIDER_INDEX = 'SET_TEST_RUN_VIEW_SLIDER_INDEX';
+  static readonly SET_REMOTE_CONNECT = 'SET_REMOTE_CONNECT';
+  static readonly SET_IS_RUNNING = 'SET_IS_RUNNING';
 }
 
 const entities = [
@@ -80,7 +83,7 @@ export function runTest(runTestConfig:TestRunConfig) {
     // ask for the db connection
     ipcRenderer.send(IpcMessageTypes.RUN_BUSYBEE_TEST, runTestConfig);
     dispatch(setCurrentTestRunId(null));
-    dispatch(navigate(NavLocation.LIVE_VIEW));
+    dispatch(setIsRunning(true));
   }
 }
 
@@ -109,7 +112,9 @@ export function listenForBusybeeMessages() {
           if (!savedResult) {
             throw Error("error when saving result!")
           }
+
           dispatch(fetchTestRunHistory());
+          dispatch(setIsRunning(false));
           dispatch(testRunResultRecieved(savedResult));
         break;
         default:
@@ -133,7 +138,7 @@ export function fetchTestRunHistory() {
       statusRepo
         .createQueryBuilder("status")
         .groupBy("status.runTimestamp")
-        .orderBy("status.runTimestamp", "ASC")
+        .orderBy("status.runTimestamp", "DESC")
         .getMany()
             
     dispatch(testRunHistoryRecieved(orderedHistory));
@@ -206,3 +211,23 @@ export const setTestRunViewSliderIndex = (index:number) => ({
   type: ActionTypes.SET_TEST_RUN_VIEW_SLIDER_INDEX,
   payload: index
 });
+
+export const setRemoteConnect = (value:boolean) => ({
+  type: ActionTypes.SET_REMOTE_CONNECT,
+  payload: value
+});
+
+export const setIsRunning = (value:boolean) => ({
+  type: ActionTypes.SET_IS_RUNNING,
+  payload: value
+});
+
+
+export function connectToWs(config:WSConnectionInfo) {
+  return (dispatch:Dispatch<any>) => {  
+    // ask for the db connection
+    ipcRenderer.send(IpcMessageTypes.INIT_WS_CLIENT, config);
+    dispatch(setCurrentTestRunId(null));
+    dispatch(setIsRunning(true));
+  }
+}

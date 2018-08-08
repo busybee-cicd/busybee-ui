@@ -122,13 +122,18 @@ ipcMain.on(MessageTypes.INIT_WS_CLIENT, (event: Event, connectionInfo:WSConnecti
   initWs(connectionInfo);
 });
 
+let ws:WebSocket;
 function initWs(connectionInfo:WSConnectionInfo|null): WebSocket {
-  logger.debug('initWs')
+  logger.debug('initWs');
+  if (ws) {
+    ws.close();
+  }
+  
   let uri = 'ws://localhost:8080';
   if (connectionInfo) {
     uri = `ws:${connectionInfo.host}:${connectionInfo.port}`;
   }
-  const ws = new WebSocket(uri);
+  ws = new WebSocket(uri);
   
   ws.onerror = (e:any) => {
     logger.debug('ws error');

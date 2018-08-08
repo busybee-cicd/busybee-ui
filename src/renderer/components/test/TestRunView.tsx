@@ -1,24 +1,26 @@
 import * as React from 'react';
 import './TestRunView.scss';
 import * as _ from 'lodash';
-import TestRunHistoryListContainer from '../../containers/TestRunHistoryListContainer';
+import TestRunHistoryListContainer from '../../containers/test/TestRunHistoryListContainer';
 import { SyncLoader } from 'react-spinners';
 import Slider, { createSliderWithTooltip } from 'rc-slider';
-import { TestRunTree } from './TestRunTree';
+import TestRunTree from './TestRunTree';
 import 'rc-slider/assets/index.css';
 import * as moment from 'moment';
 import * as classNames from 'classnames';
+import TestRunFormContainer from '../../containers/test/TestRunFormContainer';
 
 interface TestRunViewProps {
+    setTestRunViewSliderIndex: (index:number) => void,
     runData: AnyOfArrays,
     runId: string | null,
     runViewSliderIndex: number,
-    setTestRunViewSliderIndex: (index:number) => void
+    isRunning: boolean
 }
 
 const SliderWithTooltip = createSliderWithTooltip(Slider);
 
-export class TestRunView extends React.Component<TestRunViewProps, any> {
+export default class TestRunView extends React.Component<TestRunViewProps, any> {
     
     sliderFormatter(v:number):string {
         if (!this.props.runId) { return `${v}`; }
@@ -29,7 +31,9 @@ export class TestRunView extends React.Component<TestRunViewProps, any> {
     render() {
         let Content;
         if (this.props.runId === null) {
-            Content = <div></div>;
+            Content = this.props.isRunning ?
+                <SyncLoader loading={true} />
+                : <TestRunFormContainer />;
         } else {
             if (_.isEmpty(this.props.runData) || !this.props.runData[this.props.runId]) {
                 Content = <SyncLoader loading={true} />;
@@ -80,7 +84,7 @@ export class TestRunView extends React.Component<TestRunViewProps, any> {
                         <div className="text-center"><b>Test Run History</b></div>
                         <TestRunHistoryListContainer />
                     </div>
-                    <div className="pane">
+                    <div className="pane d-flex justify-content-center align-items-center">
                         {Content}
                     </div>
                 </div>

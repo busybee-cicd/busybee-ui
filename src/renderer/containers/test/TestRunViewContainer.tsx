@@ -1,14 +1,15 @@
 import { connect } from 'react-redux'
-import { TestRunView } from '../components/test/TestRunView'
+import TestRunView from '../../components/test/TestRunView'
 import { ThunkDispatch } from 'redux-thunk';
-import { RootState } from '../reducers';
-import { setTestRunViewSliderIndex } from '../actions';
+import { RootState } from '../../reducers';
+import { setTestRunViewSliderIndex } from '../../actions';
 
 ​const mapStateToProps = (state:RootState) => {
   return {
     runData: state.testRun.timeSeriesData,
     runId: state.testRun.currentRunId,
-    runViewSliderIndex: state.testRun.sliderIndex
+    runViewSliderIndex: state.testRun.sliderIndex,
+    isRunning: state.testRun.isRunning
   }
 }
 ​
