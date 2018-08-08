@@ -4,15 +4,15 @@ import { SyncLoader } from 'react-spinners';
 import { Connection } from 'typeorm';
 import TestRunFormContainer from '../containers/TestRunFormContainer';
 import TestRunViewContainer from '../containers/TestRunViewContainer';
-import {NavState} from '../../shared/enums/NavState';
+import { NavLocation } from '../../shared/enums/NavLocation';
 import * as classnames from 'classnames';
 
 interface RootProps {
     db:Connection|null,
-    navState:NavState,
+    navLocation:NavLocation,
     fetchDb: () => void,
     listenForBusybeeMessages: () => void,
-    navigate: (state:NavState) => void
+    navigate: (state:NavLocation) => void
 }
 
 export class Root extends React.Component<RootProps, any> {
@@ -22,14 +22,14 @@ export class Root extends React.Component<RootProps, any> {
         this.props.listenForBusybeeMessages();
     }
     
-    handleNavigate(navState:NavState, e:MouseEvent) {
-        this.props.navigate(navState);
+    handleNavigate(navLocation:NavLocation, e:MouseEvent) {
+        this.props.navigate(navLocation);
     }
     
     render(): any {
         let Content;
-        let runTestBtnClasses = classnames('btn btn-default', {'active': this.props.navState === NavState.TEST_RUN});
-        let liveViewBtnClasses = classnames('btn btn-default', {'active': this.props.navState === NavState.LIVE_VIEW});
+        let runTestBtnClasses = classnames('btn btn-default', {'active': this.props.navLocation === NavLocation.TEST_RUN});
+        let liveViewBtnClasses = classnames('btn btn-default', {'active': this.props.navLocation === NavLocation.LIVE_VIEW});
         
         if (!this.props.db) {
            Content = (
@@ -38,10 +38,10 @@ export class Root extends React.Component<RootProps, any> {
            );
         } else {
             Content = <TestRunFormContainer />;
-            switch (this.props.navState) {
-                case NavState.TEST_RUN:
+            switch (this.props.navLocation) {
+                case NavLocation.TEST_RUN:
                     break;
-                case NavState.LIVE_VIEW:
+                case NavLocation.LIVE_VIEW:
                     Content = <TestRunViewContainer />;
                     break;
                 default:
@@ -55,11 +55,11 @@ export class Root extends React.Component<RootProps, any> {
                     <h1 className="title">Busybee UI</h1>
                     <div className="toolbar-actions">
                         <div className="btn-group">
-                            <button className={runTestBtnClasses} onClick={this.handleNavigate.bind(this, NavState.TEST_RUN)}>
+                            <button className={runTestBtnClasses} onClick={this.handleNavigate.bind(this, NavLocation.TEST_RUN)}>
                                 <span className="icon icon-shuffle icon-text"></span>
                                 Run Test
                             </button>
-                            <button className={liveViewBtnClasses} onClick={this.handleNavigate.bind(this, NavState.LIVE_VIEW)}>
+                            <button className={liveViewBtnClasses} onClick={this.handleNavigate.bind(this, NavLocation.LIVE_VIEW)}>
                                 <span className="icon icon-cloud icon-text"></span>
                                 Live View
                             </button>

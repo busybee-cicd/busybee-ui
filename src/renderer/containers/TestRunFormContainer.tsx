@@ -3,13 +3,13 @@ import { TestRunForm } from '../components/test/TestRunForm'
 import { runTest } from '../actions';
 import { ThunkDispatch } from 'redux-thunk';
 import { TestRunConfig } from '../../shared/models/TestRunConfig';
-import { AppState } from '../reducers';
+import { RootState } from '../reducers';
 
-​const mapStateToProps = (state:AppState) => {
+​const mapStateToProps = (state:RootState) => {
   return {
-    testDirPath: state.testDirPath,
-    wsHost: state.wsHost,
-    wsPort: state.wsPort
+    testDirPath: state.app.testDirPath,
+    wsHost: state.app.wsHost,
+    wsPort: state.app.wsPort
   }
 }
 ​

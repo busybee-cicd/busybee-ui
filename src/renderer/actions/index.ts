@@ -5,13 +5,13 @@ import { UserEntity } from '../entities/UserEntity';
 ​import { Connection, getConnectionManager, ConnectionManager, createConnection, Repository } from 'typeorm';
 import { Dispatch, AnyAction } from 'redux';
 import * as IpcMessageTypes from '../../shared/constants/ipc-message-types';
-import {NavState} from '../../shared/enums/NavState';
+import {NavLocation} from '../../shared/enums/NavLocation';
 import { TestRunConfig } from '../../shared/models/TestRunConfig';
 import { BusybeeMessageI } from '../../shared/models/BusybeeMessageI';
 import { TestRunStatusEntity } from '../entities/TestRunStatusEntity';
 import * as BusybeeMessageTypes from "../../shared/constants/busybee-message-types";
 import { TestRunResultEntity } from '../entities/TestRunResultEntity';
-import { AppState } from '../reducers';
+import { RootState } from '../reducers';
 
 export class ActionTypes {
   static readonly DB_READY = 'DB_READY'; 
@@ -32,7 +32,6 @@ export class ActionTypes {
 }
 
 const entities = [
-  UserEntity,
   TestRunStatusEntity,
   TestRunResultEntity
 ];
@@ -43,7 +42,6 @@ export function fetchDb() {
     ipcRenderer.send(IpcMessageTypes.GET_DB_FILE);
     // listen for the db connection
     ipcRenderer.on(IpcMessageTypes.DB_FILE_READY, async (event:any, dbFile:Uint8Array) => {
-        
         // check for existing connection
         let db:Connection;
         const manager:ConnectionManager = getConnectionManager();
@@ -82,14 +80,16 @@ export function runTest(runTestConfig:TestRunConfig) {
     // ask for the db connection
     ipcRenderer.send(IpcMessageTypes.RUN_BUSYBEE_TEST, runTestConfig);
     dispatch(setCurrentTestRunId(null));
-    dispatch(navigate(NavState.LIVE_VIEW));
+    dispatch(navigate(NavLocation.LIVE_VIEW));
   }
 }
 
 export function listenForBusybeeMessages() {
-  return (dispatch:Dispatch<any>, getState: () => AppState) => {  
+  return (dispatch:Dispatch<any>, getState: () => RootState) => {  
     ipcRenderer.on(IpcMessageTypes.BUSYBEE_MSG, async (event:any, msg:BusybeeMessageI) => {
-      const { db } = getState();
+      const { app } = getState();
+      const { db } = app;
+
       if (!db) {
         throw Error("no active database connection")
       }
@@ -120,8 +120,10 @@ export function listenForBusybeeMessages() {
 }
 
 export function fetchTestRunHistory() {
-  return async (dispatch:Dispatch<AnyAction>, getState:() => AppState) => {  
-    const { db } = getState();
+  return async (dispatch:Dispatch<AnyAction>, getState:() => RootState) => {
+    const { app } = getState()
+    const { db } = app;
+
     if (!db) {
       throw Error("no active database connection")
     }
@@ -153,9 +155,9 @@ export const busybeeMessageRecieved = (msg: BusybeeMessageI) => ({
   payload: msg
 });
 
-export const navigate = (navState: NavState) => ({
+export const navigate = (navLocation: NavLocation) => ({
   type: ActionTypes.NAVIGATE,
-  payload: navState
+  payload: navLocation
 });
 
 export const testRunHistoryRecieved = (history: TestRunStatusEntity[]) => ({
@@ -164,13 +166,16 @@ export const testRunHistoryRecieved = (history: TestRunStatusEntity[]) => ({
 });
 
 export function setCurrentTestRunId(runId: string | null) {
-  return async (dispatch:Dispatch<AnyAction>, getState:() => AppState) => {
-    const { db, timeSeriesTestRunData } = getState();
+  return async (dispatch:Dispatch<AnyAction>, getState:() => RootState) => {
+    const { app, testRun } = getState();
+    const { db } = app;
+    const { timeSeriesData } = testRun;
+
     if (!db) {
       throw Error("no active database connection")
     }
 
-    if (runId != null && !timeSeriesTestRunData[runId]) {
+    if (runId != null && !timeSeriesData[runId]) {
       // we need to populate this run's data into the timeSeriesTestRunData
       const statusRepo:Repository<TestRunStatusEntity> = db.getRepository(TestRunStatusEntity);
       const orderedRunData:TestRunStatusEntity[] = await
@@ -180,9 +185,9 @@ export function setCurrentTestRunId(runId: string | null) {
         .orderBy("status.timestamp", "ASC")
         .getMany()
 
-      timeSeriesTestRunData[runId] = orderedRunData;
+        timeSeriesData[runId] = orderedRunData;
     }
-    dispatch(setTimeSeriesRunData(timeSeriesTestRunData));
+    dispatch(setTimeSeriesRunData(timeSeriesData));
     dispatch(currentTestRunIdSet(runId))
   }
 }

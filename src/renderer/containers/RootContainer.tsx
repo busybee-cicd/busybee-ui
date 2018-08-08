@@ -2,13 +2,13 @@ import { connect } from 'react-redux'
 import { Root } from '../components/Root'
 import { fetchDb, listenForBusybeeMessages, navigate } from '../actions';
 import { ThunkDispatch } from 'redux-thunk';
-import { NavState } from '../../shared/enums/NavState';
-import { AppState } from '../reducers';
+import { NavLocation } from '../../shared/enums/NavLocation';
+import { RootState } from '../reducers';
 
-​const mapStateToProps = (state:AppState) => {
+​const mapStateToProps = (state:RootState) => {
   return {
-    db: state.db,
-    navState: state.currentNavState
+    db: state.app.db,
+    navLocation: state.app.currentNavLocation
   }
 }
 ​
@@ -16,7 +16,7 @@ const mapDispatchToProps = (dispatch:ThunkDispatch<any,any,any>) => {
   return {
     fetchDb: () => dispatch(fetchDb()),
     listenForBusybeeMessages: () => dispatch(listenForBusybeeMessages()),
-    navigate: (navState:NavState) => dispatch(navigate(navState))
+    navigate: (navLocation:NavLocation) => dispatch(navigate(navLocation))
   }
 }
 ​

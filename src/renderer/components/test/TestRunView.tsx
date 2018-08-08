@@ -7,6 +7,7 @@ import Slider, { createSliderWithTooltip } from 'rc-slider';
 import { TestRunTree } from './TestRunTree';
 import 'rc-slider/assets/index.css';
 import * as moment from 'moment';
+import * as classNames from 'classnames';
 
 interface TestRunViewProps {
     runData: AnyOfArrays,
@@ -33,11 +34,20 @@ export class TestRunView extends React.Component<TestRunViewProps, any> {
             if (_.isEmpty(this.props.runData) || !this.props.runData[this.props.runId]) {
                 Content = <SyncLoader loading={true} />;
             } else {
-                let dataArr = this.props.runData[this.props.runId];
-                let totalSteps = dataArr.length;
+                const dataArr = this.props.runData[this.props.runId];
+                const totalSteps = dataArr.length;
+                const sliderClasses = classNames(
+                    [
+                        'p-2', 'justify-content-center', 'align-items-center'
+                    ],
+                    {
+                        hide: totalSteps < 2 ? true: false,
+                        'd-flex': totalSteps < 2 ? false : true 
+                    }
+                );
                 Content = (
                     <div className="w-100 h-100">
-                        <div className="d-flex p-2 justify-content-center align-items-center">
+                        <div className={sliderClasses}>
                             <SliderWithTooltip
                                 dots
                                 style={{
