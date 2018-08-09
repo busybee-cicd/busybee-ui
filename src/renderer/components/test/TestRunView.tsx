@@ -32,21 +32,21 @@ export default class TestRunView extends React.Component<TestRunViewProps, any> 
     getTestViewNav() {
         if (this.props.runId === null) return;
 
-        let testViewNavClasses = classNames({
+        let testViewNavClasses = classNames('subnav-item', {
             btn: true,
             'btn-primary': !this.props.isRunning,
-            'btn-negative': this.props.isRunning
+            'btn-negative': this.props.isRunning     
         });
 
         let runOrCancelAction:any = this.props.isRunning ?
             this.props.cancelTest
-            : this.props.setCurrentTestRunId(null)
+            : () => (this.props.setCurrentTestRunId(null))
 
         
         let message = this.props.isRunning ? 'Cancel' : 'New Test Run';
 
         return (
-            <div className='d-flex align-items-end'>
+            <div className='d-flex flex-row-reverse'>
                 <button onClick={runOrCancelAction.bind(this)} className={testViewNavClasses}>{message}</button>
             </div>
         )
@@ -56,9 +56,15 @@ export default class TestRunView extends React.Component<TestRunViewProps, any> 
     render() {
         let Content;
         if (this.props.runId === null) { // no id is set so we're either waiting for events or the Form should be displayed
-            Content = this.props.isRunning ?
+            let LoadingOrForm = this.props.isRunning ?
                 <SyncLoader loading={true} />
                 : <TestRunFormContainer />;
+            
+            Content = (
+                <div className='d-flex h-100 justify-content-center align-items-center'>
+                    {LoadingOrForm}
+                </div>
+            )
         } else {
             const dataArr = this.props.runData[this.props.runId];
             const totalSteps = dataArr.length;
@@ -99,13 +105,13 @@ export default class TestRunView extends React.Component<TestRunViewProps, any> 
         }
 
         return (
-            <div className="w-100 h-100">
+            <div id="TestRunView" className="w-100 h-100">
                 <div className="pane-group">
                     <div className="pane-sm sidebar">
                         <div className="text-center"><b>Test Run History</b></div>
                         <TestRunHistoryListContainer />
                     </div>
-                    <div className="pane d-flex justify-content-center align-items-center">
+                    <div className="pane d-flex flex-column">
                         {this.getTestViewNav()}
                         {Content}
                     </div>

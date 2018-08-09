@@ -80,7 +80,7 @@ export class TestRunForm extends React.Component<TestRunFormProps, any> {
         }
         
         return (
-            <div className="message col-sm-6 col-offset-3">
+            <div className="col-sm-6 col-offset-3">
                 <Formik
                         initialValues={{
                           remoteConnect: false,
