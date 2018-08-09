@@ -14,7 +14,7 @@ export interface TestRunState extends State {
   
 let initialTSTestRunData:AnyOfArrays = {};
 
-const initialTestRunState:TestRunState = {
+const initialState:TestRunState = {
     currentRunId: null,
     sliderIndex: 0,
     history: [],
@@ -24,7 +24,7 @@ const initialTestRunState:TestRunState = {
     defaultWsPort: 8080
 };
 
-export default (state:TestRunState = initialTestRunState, action:ReducerAction):TestRunState => {
+export default (state:TestRunState = initialState, action:ReducerAction):TestRunState => {
     switch (action.type) {
         case ActionTypes.testRun.SET_CURRENT_TEST_RUN_ID:
             return set(state, {currentRunId: action.payload, sliderIndex: 0});

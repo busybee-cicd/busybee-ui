@@ -15,7 +15,9 @@ import { Actions } from '../../actions';
 ​
 const mapDispatchToProps = (dispatch:ThunkDispatch<any,any,any>) => {
   return {
-    setTestRunViewSliderIndex: (index:number) => {dispatch(Actions.testRun.setTestRunViewSliderIndex(index)); }
+    cancelTest: () => dispatch(Actions.testRun.cancelTest()),
+    setCurrentTestRunId: (runId: string | null) => dispatch(Actions.testRun.setCurrentTestRunId(runId)),
+    setTestRunViewSliderIndex: (index:number) => dispatch(Actions.testRun.setTestRunViewSliderIndex(index))
   }
 }
 ​

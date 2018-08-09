@@ -3,7 +3,7 @@ const ipcRenderer = require('electron').ipcRenderer;
 require('reflect-metadata');
 ​import { Repository } from 'typeorm';
 import { Dispatch, AnyAction } from 'redux';
-import * as IpcMessageTypes from '../../shared/constants/ipc-message-types';
+import {IpcMessageType }from '../../shared/constants/IpcMessageType';
 import { TestRunConfig } from '../../shared/models/TestRunConfig';
 import { TestRunStatusEntity } from '../entities/TestRunStatusEntity';
 import { RootState } from '../reducers';
@@ -26,9 +26,27 @@ export default class TestRunActions {
     static runTest(runTestConfig:TestRunConfig) {
         return (dispatch:Dispatch<any>) => {  
             // ask for the db connection
-            ipcRenderer.send(IpcMessageTypes.RUN_BUSYBEE_TEST, runTestConfig);
+            ipcRenderer.send(IpcMessageType.RUN_BUSYBEE_TEST, runTestConfig);
             dispatch(TestRunActions.setCurrentTestRunId(null));
             dispatch(TestRunActions.setIsRunning(true));
+        }
+    }
+    
+    static cancelTest() {
+        return async (dispatch:Dispatch<any>, getState:() => RootState) => {  
+            const { app, testRun } = getState();
+            const { db } = app;
+            const { currentRunId } = testRun;
+
+            if (db && currentRunId) {
+                const statusRepo:Repository<TestRunStatusEntity> = db.getRepository(TestRunStatusEntity);
+                await statusRepo.delete({runId: currentRunId});
+            }
+            
+            // ask for the db connection
+            ipcRenderer.send(IpcMessageType.CANCEL_BUSYBEE_TEST);
+            dispatch(TestRunActions.setCurrentTestRunId(null));
+            dispatch(TestRunActions.setIsRunning(false));
         }
     }
 
@@ -139,7 +157,7 @@ export default class TestRunActions {
     static connectToWs(config:WSConnectionInfo) {
         return (dispatch:Dispatch<any>) => {  
             // ask for the db connection
-            ipcRenderer.send(IpcMessageTypes.INIT_WS_CLIENT, config);
+            ipcRenderer.send(IpcMessageType.INIT_WS_CLIENT, config);
             dispatch(TestRunActions.setCurrentTestRunId(null));
             dispatch(TestRunActions.setIsRunning(true));
         }

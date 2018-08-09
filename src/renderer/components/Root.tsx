@@ -6,10 +6,16 @@ import TestRunViewContainer from '../containers/test/TestRunViewContainer';
 import { NavLocation } from '../../shared/enums/NavLocation';
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastMessageI } from '../../shared/models/ToastMessageI';
+
 interface RootProps {
     runId: string|null,
     db:Connection|null,
     navLocation:NavLocation,
+    toast: ToastMessageI | null,
+    dismissToast: () => void,
     fetchDb: () => void,
     listenForBusybeeMessages: () => void,
     navigate: (state:NavLocation) => void,
@@ -23,6 +29,21 @@ export class Root extends React.Component<RootProps, any> {
         this.props.listenForBusybeeMessages();
     }
     
+    componentDidUpdate() {
+        if (this.props.toast) {
+            console.log('toast!');
+            let _toast:any = toast;
+            _toast[this.props.toast.level.toString()](
+                this.props.toast.value,
+                {
+                    onClose: () => (this.props.dismissToast()),
+                    position: toast.POSITION.BOTTOM_RIGHT,
+                    autoClose: false
+                }
+            );
+        }
+    }
+
     handleNavigate(navLocation:NavLocation, e:MouseEvent) {
         this.props.navigate(navLocation);
     }
@@ -92,6 +113,7 @@ export class Root extends React.Component<RootProps, any> {
                 <div className="window-content w-100 h-100 d-flex justify-content-center align-items-center">
                     {Content}
                 </div>
+                <ToastContainer />
             </div>
         )
     }

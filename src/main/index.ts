@@ -4,12 +4,12 @@ import { app, BrowserWindow, Event, ipcMain } from 'electron'
 import * as path from 'path'
 import { format as   formatUrl } from 'url'
 import SQL from 'sql.js';
-import * as MessageTypes from '../shared/constants/ipc-message-types';
+import { IpcMessageType } from '../shared/constants/IpcMessageType';
 import * as fs from 'fs-extra';
 import * as WebSocket from 'ws';
 import { WSConnectionInfo } from '../shared/models/WSConnectionInfo';
 import { TestRunConfig } from '../shared/models/TestRunConfig';
-import { spawn } from 'child_process';
+import { spawn, ChildProcess } from 'child_process';
 import { IOUtil, Logger, LoggerConf } from 'busybee-util';
 
 const loggerConf = new LoggerConf(
@@ -88,7 +88,7 @@ const databaseDir = path.join(app.getPath('userData'), 'databases')
 fs.mkdirsSync(databaseDir);
 const databaseFilePath = path.join(databaseDir, 'starter.db');
 
-ipcMain.on(MessageTypes.GET_DB_FILE, async (event:Event) => {
+ipcMain.on(IpcMessageType.GET_DB_FILE, async (event:Event) => {
 
   try {
     
@@ -102,24 +102,28 @@ ipcMain.on(MessageTypes.GET_DB_FILE, async (event:Event) => {
       await fs.writeFile(databaseFilePath, buffer);
     }
     
-    event.sender.send(MessageTypes.DB_FILE_READY, dbFile);
+    event.sender.send(IpcMessageType.DB_FILE_READY, dbFile);
   } catch (e) {
     logger.error(e.message);
   }
 });
 
-ipcMain.on(MessageTypes.WRITE_DB_DATA, (event:Event, dbData:Uint8Array) => {
+ipcMain.on(IpcMessageType.WRITE_DB_DATA, (event:Event, dbData:Uint8Array) => {
   const buffer = new Buffer(dbData);
   fs.writeFile(databaseFilePath, buffer); 
 });
 
 // Busybee CMDLine events
-ipcMain.on(MessageTypes.RUN_BUSYBEE_TEST, (event: Event, runConfig:TestRunConfig) => {
+ipcMain.on(IpcMessageType.RUN_BUSYBEE_TEST, (event: Event, runConfig:TestRunConfig) => {
   busybeeTest(runConfig);
 });
 
-ipcMain.on(MessageTypes.INIT_WS_CLIENT, (event: Event, connectionInfo:WSConnectionInfo|null = null) => {
+ipcMain.on(IpcMessageType.INIT_WS_CLIENT, (event: Event, connectionInfo:WSConnectionInfo|null = null) => {
   initWs(connectionInfo);
+});
+
+ipcMain.on(IpcMessageType.CANCEL_BUSYBEE_TEST, (event: Event) => {
+  runCmd.kill();
 });
 
 let ws:WebSocket;
@@ -138,6 +142,9 @@ function initWs(connectionInfo:WSConnectionInfo|null): WebSocket {
   ws.onerror = (e:any) => {
     logger.debug('ws error');
     logger.debug(e, true);
+    if (mainWindow) {
+      mainWindow.webContents.send(IpcMessageType.WS_CLIENT_ERROR, `Error communicating with Busybee @ ${uri}. Please ensure that the port is available. If connecting remotely confirm that Busybee is running`);
+    }
   }
   
   ws.onopen = () => {
@@ -149,7 +156,7 @@ function initWs(connectionInfo:WSConnectionInfo|null): WebSocket {
     // pass to the render
     if (mainWindow !== null) {
       // send data to the browser
-      mainWindow.webContents.send(MessageTypes.BUSYBEE_MSG, JSON.parse(e.data));
+      mainWindow.webContents.send(IpcMessageType.BUSYBEE_MSG, JSON.parse(e.data));
     }
   }
   
@@ -160,11 +167,11 @@ function initWs(connectionInfo:WSConnectionInfo|null): WebSocket {
   return ws;
 }
 
-
+let runCmd:ChildProcess;
 function busybeeTest(runConfig:TestRunConfig) {
   logger.debug('busybeeTest')
   // run busybee
-  const runCmd  = spawn('busybee', ['test', '-d', runConfig.dirPath, '-w', `${runConfig.wsConnectionInfo.port}`]);
+  runCmd  = spawn('busybee', ['test', '-d', runConfig.dirPath, '-w', `${runConfig.wsConnectionInfo.port}`]);
   
   runCmd.stderr.on('data', (data) => {
     logger.debug('error recieved');

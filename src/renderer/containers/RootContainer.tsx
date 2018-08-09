@@ -9,16 +9,18 @@ import { RootState } from '../reducers';
   return {
     db: state.app.db,
     runId: state.testRun.currentRunId,
-    navLocation: state.app.currentNavLocation
+    navLocation: state.app.currentNavLocation,
+    toast: state.toast.message
   }
 }
 ​
 const mapDispatchToProps = (dispatch:ThunkDispatch<any,any,any>) => {
   return {
     fetchDb: () => dispatch(Actions.app.fetchDb()),
-    listenForBusybeeMessages: () => dispatch(Actions.app.listenForBusybeeMessages()),
+    listenForBusybeeMessages: () => dispatch(Actions.app.listenForIpcMessages()),
     navigate: (navLocation:NavLocation) => dispatch(Actions.app.navigate(navLocation)),
-    setCurrentTestRunId: (runId: string|null) => dispatch(Actions.testRun.setCurrentTestRunId(runId))
+    setCurrentTestRunId: (runId: string|null) => dispatch(Actions.testRun.setCurrentTestRunId(runId)),
+    dismissToast: () =>  dispatch(Actions.toast.dismiss())
   }
 }
 ​

@@ -706,7 +706,7 @@
     "@types/rc-tooltip" "*"
     "@types/react" "*"
 
-"@types/rc-tooltip@*":
+"@types/rc-tooltip@*", "@types/rc-tooltip@^3.4.12":
   version "3.4.12"
   resolved "https://registry.yarnpkg.com/@types/rc-tooltip/-/rc-tooltip-3.4.12.tgz#7a7aeb036e7378f5adeb6afcba1a905c1804d8a8"
   dependencies:
@@ -726,9 +726,16 @@
     "@types/react" "*"
     redux "^4.0.0"
 
-"@types/react-tooltip@^3.3.6":
-  version "3.3.6"
-  resolved "https://registry.yarnpkg.com/@types/react-tooltip/-/react-tooltip-3.3.6.tgz#c9b0dbfc981e9543a6ab94a9ab495513460393fd"
+"@types/react-toastify@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@types/react-toastify/-/react-toastify-4.0.1.tgz#5eef518608a6d65a8b5dbaee81b55f0c0281b873"
+  dependencies:
+    "@types/react" "*"
+    "@types/react-transition-group" "*"
+
+"@types/react-transition-group@*":
+  version "2.0.13"
+  resolved "https://registry.yarnpkg.com/@types/react-transition-group/-/react-transition-group-2.0.13.tgz#7769fb61eb71d64d087a713956f086a42c3ee171"
   dependencies:
     "@types/react" "*"
 
@@ -3267,7 +3274,7 @@ dom-converter@~0.1:
   dependencies:
     utila "~0.3"
 
-dom-helpers@^3.2.0:
+dom-helpers@^3.2.0, dom-helpers@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/dom-helpers/-/dom-helpers-3.3.1.tgz#fc1a4e15ffdf60ddde03a480a9c0fece821dd4a6"
 
@@ -7103,7 +7110,7 @@ promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
-prop-types@15.x, prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.6, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1:
+prop-types@15.x, prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.6, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2:
   version "15.6.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.2.tgz#05d5ca77b4453e985d60fc7ff8c859094a497102"
   dependencies:
@@ -7267,7 +7274,7 @@ rc-slider@^8.6.1:
     shallowequal "^1.0.1"
     warning "^3.0.0"
 
-rc-tooltip@^3.7.0:
+rc-tooltip@^3.7.0, rc-tooltip@^3.7.2:
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/rc-tooltip/-/rc-tooltip-3.7.2.tgz#3698656d4bacd51b72d9e327bed15d1d5a9f1b27"
   dependencies:
@@ -7344,6 +7351,10 @@ react-fast-compare@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/react-fast-compare/-/react-fast-compare-1.0.0.tgz#813a039155e49b43ceffe99528fe5e9d97a6c938"
 
+react-lifecycles-compat@^3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
+
 react-redux@^5.0.7:
   version "5.0.7"
   resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-5.0.7.tgz#0dc1076d9afb4670f993ffaef44b8f8c1155a4c8"
@@ -7364,12 +7375,13 @@ react-spinners@^0.3.3:
     react-emotion "^9.1.1"
     recompose "0.26.0"
 
-react-tooltip@^3.6.1:
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/react-tooltip/-/react-tooltip-3.6.1.tgz#2ca993baa50d7e0271b8d13c6024445a883842eb"
+react-toastify@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/react-toastify/-/react-toastify-4.1.0.tgz#0d14d3cf36523ade27a2edd5323a9db373dce4c5"
   dependencies:
     classnames "^2.2.5"
     prop-types "^15.6.0"
+    react-transition-group "^2.2.1"
 
 react-transition-group@^1.1.3:
   version "1.2.1"
@@ -7380,6 +7392,15 @@ react-transition-group@^1.1.3:
     loose-envify "^1.3.1"
     prop-types "^15.5.6"
     warning "^3.0.0"
+
+react-transition-group@^2.2.1:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-2.4.0.tgz#1d9391fabfd82e016f26fabd1eec329dbd922b5a"
+  dependencies:
+    dom-helpers "^3.3.1"
+    loose-envify "^1.3.1"
+    prop-types "^15.6.2"
+    react-lifecycles-compat "^3.0.4"
 
 react@^16.4.1:
   version "16.4.1"

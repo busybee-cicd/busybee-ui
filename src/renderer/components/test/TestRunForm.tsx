@@ -5,7 +5,8 @@ import { Formik } from 'formik';
 import { TestRunConfig } from '../../../shared/models/TestRunConfig';
 import { WSConnectionInfo } from '../../../shared/models/WSConnectionInfo';
 import FormikCheckbox from '../form/FormikCheckbox';
-import ReactTooltip from 'react-tooltip'
+import Tooltip from 'rc-tooltip';
+import 'rc-tooltip/assets/bootstrap_white.css';
 
 interface TestRunFormProps {
     connectToWs: (config:WSConnectionInfo) => void;
@@ -47,11 +48,34 @@ export class TestRunForm extends React.Component<TestRunFormProps, any> {
         )
     }
 
+    getHostInput(values:any, errors: any, touched:any, handleChange:any, handleBlur:any) {
+        if (!values.remoteConnect) { return; }
+
+        return (
+            <div className="form-group">
+                <Tooltip overlay='The host that your Busybee Instance is running on'>
+                    <label>
+                        WebSocket Host <span className="icon icon-help-circled"></span>
+                    </label>
+                </Tooltip>
+                <input
+                    type="text"
+                    name="wsHost"
+                    className="form-control"
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    value={values.wsHost}
+                />
+                {touched.wsHost && errors.wsHost && <div>{errors.wsHost}</div>}
+            </div>
+        )
+    }
+
     render(){
 
-        const getWebsocketTip = (isRemoteConnect:boolean) => {
+        const getWebsocketPortTip = (isRemoteConnect:boolean) => {
             return isRemoteConnect ?
-                'The Websocket port that an existing Busybee Instance is currently bound to'
+                'The Websocket port that a running Busybee Instance is currently bound to'
                 : 'The Websocket port that Busybee will bind to for communicating with the Busybee UI'
         }
         
@@ -110,20 +134,13 @@ export class TestRunForm extends React.Component<TestRunFormProps, any> {
                             <form onSubmit={handleSubmit}>
                                 {this.getRemoteConnectCheckbox()}
                                 {this.getTestDirInput(values, errors, touched, handleChange, handleBlur)}
+                                {this.getHostInput(values, errors, touched, handleChange, handleBlur)}
                                 <div className="form-group">
-                                    <label>WebSocket Host <span data-tip={getWebsocketTip(values.remoteConnect)} className="icon icon-help-circled"></span></label>
-                                    <input
-                                        type="text"
-                                        name="wsHost"
-                                        className="form-control"
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        value={values.wsHost}
-                                    />
-                                    {touched.wsHost && errors.wsHost && <div>{errors.wsHost}</div>}
-                                </div>
-                                <div className="form-group">
-                                    <label>WS Port <span className="icon icon-help-circled"></span></label>
+                                    <Tooltip overlay={getWebsocketPortTip(values.remoteConnect)}>
+                                        <label>
+                                            WS Port <span className="icon icon-help-circled"></span>
+                                        </label>
+                                    </Tooltip>
                                     <input
                                         type="text"
                                         name="wsPort"
@@ -143,7 +160,6 @@ export class TestRunForm extends React.Component<TestRunFormProps, any> {
                             </form>
                         )}
                     />
-                    <ReactTooltip />
             </div>
         )
         

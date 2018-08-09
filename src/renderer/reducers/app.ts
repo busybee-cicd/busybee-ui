@@ -8,12 +8,12 @@ export interface AppState extends State {
     db: Connection | null
   }
   
-const initialAppState:AppState = {
+const initialState:AppState = {
     currentNavLocation: NavLocation.TEST_RUN,
     db: null
 };
 
-export default (state:AppState = initialAppState, action:ReducerAction):AppState => {
+export default (state:AppState = initialState, action:ReducerAction):AppState => {
     switch (action.type) {
         case ActionTypes.app.DB_READY:
             return set(state, {db: action.payload});

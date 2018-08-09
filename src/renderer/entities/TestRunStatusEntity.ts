@@ -57,6 +57,7 @@ export class TestRunStatusEntity {
           environments.push({
             name: envData.suiteEnvID,
             attributes: {
+              envId: envId,
               suiteID: envData.suiteID,
               testSets: testSets,
               ports: ports

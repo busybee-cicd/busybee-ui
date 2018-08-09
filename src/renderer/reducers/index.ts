@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import appReducer, { AppState } from './app';
 import testRunReducer, { TestRunState } from './testRun';
+import toastReducer, { ToastState } from './toast';
 
 export interface State {}
 
@@ -16,9 +17,11 @@ export const set = (state:any, updatedFields:any):any  => {
 export interface RootState {
   app: AppState;
   testRun: TestRunState;
+  toast: ToastState;
 }
 
 export default combineReducers<any, any>({
   app: appReducer,
-  testRun: testRunReducer
+  testRun: testRunReducer,
+  toast: toastReducer
 });

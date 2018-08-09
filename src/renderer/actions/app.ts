@@ -3,13 +3,14 @@ const ipcRenderer = require('electron').ipcRenderer;
 require('reflect-metadata');
 ​import { Connection, getConnectionManager, ConnectionManager, createConnection, Repository } from 'typeorm';
 import { Dispatch, AnyAction } from 'redux';
-import * as IpcMessageTypes from '../../shared/constants/ipc-message-types';
+import { IpcMessageType } from '../../shared/constants/IpcMessageType';
 import { NavLocation } from '../../shared/enums/NavLocation';
 import { BusybeeMessageI } from '../../shared/models/BusybeeMessageI';
 import { TestRunStatusEntity } from '../entities/TestRunStatusEntity';
 import { TestRunResultEntity } from '../entities/TestRunResultEntity';
 import TestRunActions from './testRun';
-import BusybeeMessageTypes from '../../shared/constants/busybee-message-types';
+import ToastActions from './toast';
+import { BusybeeMessageType } from '../../shared/constants/BusybeeMessageType';
 import { RootState } from '../reducers';
 
 export class AppActionTypes {
@@ -28,9 +29,9 @@ export default class AppActions {
     static fetchDb() {
         return (dispatch:Dispatch<AnyAction>) => {  
             // ask for the db connection
-            ipcRenderer.send(IpcMessageTypes.GET_DB_FILE);
+            ipcRenderer.send(IpcMessageType.GET_DB_FILE);
             // listen for the db connection
-            ipcRenderer.on(IpcMessageTypes.DB_FILE_READY, async (event:any, dbFile:Uint8Array) => {
+            ipcRenderer.on(IpcMessageType.DB_FILE_READY, async (event:any, dbFile:Uint8Array) => {
                 // check for existing connection
                 let db:Connection;
                 const manager:ConnectionManager = getConnectionManager();
@@ -44,7 +45,7 @@ export default class AppActions {
                         synchronize: true,
                         autoSave: true,
                         autoSaveCallback: async (data: Uint8Array) => {
-                            ipcRenderer.send(IpcMessageTypes.WRITE_DB_DATA, data);
+                            ipcRenderer.send(IpcMessageType.WRITE_DB_DATA, data);
                         }
                     });
                 }
@@ -61,39 +62,44 @@ export default class AppActions {
         }
     }
 
-    static listenForBusybeeMessages() {
+    static listenForIpcMessages() {
         return (dispatch:Dispatch<any>, getState: () => RootState) => {  
-            ipcRenderer.on(IpcMessageTypes.BUSYBEE_MSG, async (event:any, msg:BusybeeMessageI) => {
-            const { app } = getState();
-            const { db } = app;
-    
-            if (!db) {
-                throw Error("no active database connection")
-            }
-    
-            switch (msg.type) {
-                case BusybeeMessageTypes.TEST_RUN_STATUS:
-                    const statusRepo:Repository<TestRunStatusEntity> = db.getRepository(TestRunStatusEntity);
-                    const savedStatus = await statusRepo.save(new TestRunStatusEntity(msg));
-                    if (!savedStatus) {
-                        throw Error("error when saving status!")
-                    }
-                    dispatch(TestRunActions.testRunStatusRecieved(savedStatus));
-                    break;
-                case BusybeeMessageTypes.TEST_RUN_RESULT:
-                    const resultRepo:Repository<TestRunResultEntity> = db.getRepository(TestRunResultEntity);
-                    const savedResult = await resultRepo.save(new TestRunStatusEntity(msg));
-                    if (!savedResult) {
-                        throw Error("error when saving result!")
-                    }
-    
-                    dispatch(TestRunActions.fetchTestRunHistory());
-                    dispatch(TestRunActions.setIsRunning(false));
-                    dispatch(TestRunActions.testRunResultRecieved(savedResult));
-                    break;
-                default:
-                    dispatch(AppActions.busybeeMessageRecieved(msg));
-            }
+            ipcRenderer.on(IpcMessageType.BUSYBEE_MSG, async (event:any, msg:BusybeeMessageI) => {
+                const { app } = getState();
+                const { db } = app;
+        
+                if (!db) {
+                    throw Error("no active database connection")
+                }
+        
+                switch (msg.type) {
+                    case BusybeeMessageType.TEST_RUN_STATUS:
+                        const statusRepo:Repository<TestRunStatusEntity> = db.getRepository(TestRunStatusEntity);
+                        const savedStatus = await statusRepo.save(new TestRunStatusEntity(msg));
+                        if (!savedStatus) {
+                            throw Error("error when saving status!")
+                        }
+                        dispatch(TestRunActions.testRunStatusRecieved(savedStatus));
+                        break;
+                    case BusybeeMessageType.TEST_RUN_RESULT:
+                        const resultRepo:Repository<TestRunResultEntity> = db.getRepository(TestRunResultEntity);
+                        const savedResult = await resultRepo.save(new TestRunStatusEntity(msg));
+                        if (!savedResult) {
+                            throw Error("error when saving result!")
+                        }
+        
+                        dispatch(TestRunActions.fetchTestRunHistory());
+                        dispatch(TestRunActions.setIsRunning(false));
+                        dispatch(TestRunActions.testRunResultRecieved(savedResult));
+                        break;
+                    default:
+                        dispatch(AppActions.busybeeMessageRecieved(msg));
+                }
+            });
+
+            ipcRenderer.on(IpcMessageType.WS_CLIENT_ERROR, (event:any, message:string) => {
+                dispatch(TestRunActions.setIsRunning(false));
+                dispatch(ToastActions.error(message));
             });
         }
     }
