@@ -31,7 +31,6 @@ export class Root extends React.Component<RootProps, any> {
     
     componentDidUpdate() {
         if (this.props.toast) {
-            console.log('toast!');
             let _toast:any = toast;
             _toast[this.props.toast.level.toString()](
                 this.props.toast.value,

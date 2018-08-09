@@ -9,7 +9,8 @@ export interface TestRunState extends State {
     timeSeriesData: AnyOfArrays,
     defaultHost: string,
     defaultWsPort: number,
-    isRunning: false
+    isRunning: boolean,
+    remoteConnect: boolean
   }
   
 let initialTSTestRunData:AnyOfArrays = {};
@@ -21,7 +22,8 @@ const initialState:TestRunState = {
     isRunning: false,
     timeSeriesData : initialTSTestRunData,
     defaultHost: '127.0.0.1',
-    defaultWsPort: 8080
+    defaultWsPort: 8080,
+    remoteConnect: false
 };
 
 export default (state:TestRunState = initialState, action:ReducerAction):TestRunState => {

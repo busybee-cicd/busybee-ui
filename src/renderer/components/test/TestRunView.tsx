@@ -16,7 +16,8 @@ interface TestRunViewProps {
     runData: AnyOfArrays,
     runId: string | null,
     runViewSliderIndex: number,
-    isRunning: boolean
+    isRunning: boolean,
+    remoteConnect: boolean
 }
 
 const SliderWithTooltip = createSliderWithTooltip(Slider);
@@ -43,7 +44,14 @@ export default class TestRunView extends React.Component<TestRunViewProps, any> 
             : () => (this.props.setCurrentTestRunId(null))
 
         
-        let message = this.props.isRunning ? 'Cancel' : 'New Test Run';
+        let message;
+        if (this.props.isRunning) {
+            message = this.props.remoteConnect ?
+                'Disconnect'
+                : 'Cancel';
+        } else {
+            message = 'New Test Run';
+        }
 
         return (
             <div className='d-flex flex-row-reverse'>

@@ -97,6 +97,10 @@ export default class AppActions {
                 }
             });
 
+            ipcRenderer.on(IpcMessageType.WS_CLIENT_CLOSED, (event:any, message:string) => {
+                dispatch(TestRunActions.setRemoteConnect(false));
+            });
+
             ipcRenderer.on(IpcMessageType.WS_CLIENT_ERROR, (event:any, message:string) => {
                 dispatch(TestRunActions.setIsRunning(false));
                 dispatch(ToastActions.error(message));

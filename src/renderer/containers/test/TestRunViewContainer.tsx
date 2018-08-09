@@ -9,7 +9,8 @@ import { Actions } from '../../actions';
     runData: state.testRun.timeSeriesData,
     runId: state.testRun.currentRunId,
     runViewSliderIndex: state.testRun.sliderIndex,
-    isRunning: state.testRun.isRunning
+    isRunning: state.testRun.isRunning,
+    remoteConnect: state.testRun.remoteConnect
   }
 }
 ​

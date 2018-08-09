@@ -157,9 +157,10 @@ export default class TestRunActions {
     static connectToWs(config:WSConnectionInfo) {
         return (dispatch:Dispatch<any>) => {  
             // ask for the db connection
-            ipcRenderer.send(IpcMessageType.INIT_WS_CLIENT, config);
+            ipcRenderer.send(IpcMessageType.WS_CLIENT_INIT, config);
             dispatch(TestRunActions.setCurrentTestRunId(null));
             dispatch(TestRunActions.setIsRunning(true));
+            dispatch(this.setRemoteConnect(true));
         }
     }
 }

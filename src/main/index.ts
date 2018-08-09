@@ -118,15 +118,22 @@ ipcMain.on(IpcMessageType.RUN_BUSYBEE_TEST, (event: Event, runConfig:TestRunConf
   busybeeTest(runConfig);
 });
 
-ipcMain.on(IpcMessageType.INIT_WS_CLIENT, (event: Event, connectionInfo:WSConnectionInfo|null = null) => {
+ipcMain.on(IpcMessageType.WS_CLIENT_INIT, (event: Event, connectionInfo:WSConnectionInfo|null = null) => {
   initWs(connectionInfo);
 });
 
 ipcMain.on(IpcMessageType.CANCEL_BUSYBEE_TEST, (event: Event) => {
-  runCmd.kill();
+  if (runCmd) {
+    runCmd.kill();
+    runCmd = null;
+  }
+  if (ws) {
+    ws.close();
+    ws = null;
+  }
 });
 
-let ws:WebSocket;
+let ws:WebSocket | null;
 function initWs(connectionInfo:WSConnectionInfo|null): WebSocket {
   logger.debug('initWs');
   if (ws) {
@@ -162,18 +169,23 @@ function initWs(connectionInfo:WSConnectionInfo|null): WebSocket {
   
   ws.onclose = () => {
     logger.debug('ws closed!');
+    ws = null;
+    if (mainWindow) {
+      mainWindow.webContents.send(IpcMessageType.WS_CLIENT_CLOSED);
+    }
   }
   
   return ws;
 }
 
-let runCmd:ChildProcess;
+let runCmd:ChildProcess | null;
 function busybeeTest(runConfig:TestRunConfig) {
   logger.debug('busybeeTest')
   // run busybee
-  runCmd  = spawn('busybee', ['test', '-d', runConfig.dirPath, '-w', `${runConfig.wsConnectionInfo.port}`]);
+  runCmd = spawn('busybee', ['test', '-d', runConfig.dirPath, '-w', `${runConfig.wsConnectionInfo.port}`]);
   
   runCmd.stderr.on('data', (data) => {
+    if (!runCmd) return;
     logger.debug('error recieved');
     logger.debug(data.toString());
     runCmd.kill('SIGHUP');
