@@ -3,12 +3,13 @@ const ipcRenderer = require('electron').ipcRenderer;
 require('reflect-metadata');
 ​import { Connection, getConnectionManager, ConnectionManager, createConnection, Repository } from 'typeorm';
 import { Dispatch, AnyAction } from 'redux';
-import { IpcMessageType } from '../../shared/constants/IpcMessageType';
+import { IpcMessageType } from '../../shared/constants/IPCMessageType';
 import { NavLocation } from '../../shared/enums/NavLocation';
 import { BusybeeMessageI } from '../../shared/models/BusybeeMessageI';
 import { TestRunStatusEntity } from '../entities/TestRunStatusEntity';
-import { TestRunResultEntity } from '../entities/TestRunResultEntity';
+import { TestRunResultsEntity } from '../entities/TestRunResultsEntity';
 import TestRunActions from './testRun';
+import TestResultActions from './testResult';
 import ToastActions from './toast';
 import { BusybeeMessageType } from '../../shared/constants/BusybeeMessageType';
 import { RootState } from '../reducers';
@@ -21,7 +22,7 @@ export class AppActionTypes {
 
 const entities = [
     TestRunStatusEntity,
-    TestRunResultEntity
+    TestRunResultsEntity
 ];
 
 export default class AppActions {
@@ -82,15 +83,16 @@ export default class AppActions {
                         dispatch(TestRunActions.testRunStatusRecieved(savedStatus));
                         break;
                     case BusybeeMessageType.TEST_RUN_RESULT:
-                        const resultRepo:Repository<TestRunResultEntity> = db.getRepository(TestRunResultEntity);
-                        const savedResult = await resultRepo.save(new TestRunStatusEntity(msg));
+                        const resultRepo:Repository<TestRunResultsEntity> = db.getRepository(TestRunResultsEntity);
+                        const savedResult = await resultRepo.save(new TestRunResultsEntity(msg));
                         if (!savedResult) {
                             throw Error("error when saving result!")
                         }
         
                         dispatch(TestRunActions.fetchTestRunHistory());
                         dispatch(TestRunActions.setIsRunning(false));
-                        dispatch(TestRunActions.testRunResultRecieved(savedResult));
+                        dispatch(TestResultActions.testResultRecieved(savedResult));
+                        // navigate to result?
                         break;
                     default:
                         dispatch(AppActions.busybeeMessageRecieved(msg));

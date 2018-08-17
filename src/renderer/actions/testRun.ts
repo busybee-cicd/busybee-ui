@@ -3,7 +3,7 @@ const ipcRenderer = require('electron').ipcRenderer;
 require('reflect-metadata');
 ​import { Repository } from 'typeorm';
 import { Dispatch, AnyAction } from 'redux';
-import {IpcMessageType }from '../../shared/constants/IpcMessageType';
+import {IpcMessageType }from '../../shared/constants/IPCMessageType';
 import { TestRunConfig } from '../../shared/models/TestRunConfig';
 import { TestRunStatusEntity } from '../entities/TestRunStatusEntity';
 import { RootState } from '../reducers';
@@ -13,7 +13,6 @@ export class TestRunActionTypes {
   static readonly SET_CURRENT_TEST_RUN_ID = 'SET_CURRENT_TEST_RUN_ID';
   static readonly BUSYBEE_MESSAGE_RECIEVED = 'BUSYBEE_MESSAGE_RECIEVED';
   static readonly TEST_RUN_STATUS_RECIEVED = 'TEST_RUN_STATUS_RECIEVED';
-  static readonly TEST_RUN_RESULT_RECIEVED = 'TEST_RUN_RESULT_RECIEVED';
   static readonly TEST_RUN_HISTORY_RECIEVED = 'TEST_RUN_HISTORY_RECIEVED';
   static readonly SET_TIME_SERIES_RUN_DATA = 'SET_TIME_SERIES_RUN_DATA';
   static readonly SET_TEST_RUN_VIEW_SLIDER_INDEX = 'SET_TEST_RUN_VIEW_SLIDER_INDEX';
@@ -75,13 +74,6 @@ export default class TestRunActions {
         return {
             type: TestRunActionTypes.TEST_RUN_STATUS_RECIEVED,
             payload: status
-        }
-    }
-
-    static testRunResultRecieved(result: any) {
-        return {
-            type: TestRunActionTypes.TEST_RUN_RESULT_RECIEVED,
-            payload: result
         }
     }
 

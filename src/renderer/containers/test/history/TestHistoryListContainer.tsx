@@ -1,8 +1,8 @@
 import { connect } from 'react-redux'
-import { TestRunHistoryList } from '../../components/test/TestRunHistoryList'
+import { TestHistoryList } from '../../../components/test/history/TestHistoryList'
 import { ThunkDispatch } from 'redux-thunk';
-import { Actions } from '../../actions';
-import { RootState } from '../../reducers';
+import { Actions } from '../../../actions';
+import { RootState } from '../../../reducers';
 
 ​const mapStateToProps = (state:RootState) => {
   return {
@@ -20,4 +20,4 @@ const mapDispatchToProps = (dispatch:ThunkDispatch<any,any,any>) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(TestRunHistoryList)
+)(TestHistoryList)

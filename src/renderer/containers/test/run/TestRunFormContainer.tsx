@@ -1,10 +1,10 @@
 import { connect } from 'react-redux'
-import { TestRunForm } from '../../components/test/TestRunForm'
-import { Actions } from '../../actions';
+import { TestRunForm } from '../../../components/test/run/TestRunForm'
+import { Actions } from '../../../actions';
 import { ThunkDispatch } from 'redux-thunk';
-import { TestRunConfig } from '../../../shared/models/TestRunConfig';
-import { RootState } from '../../reducers';
-import { WSConnectionInfo } from '../../../shared/models/WSConnectionInfo';
+import { TestRunConfig } from '../../../../shared/models/TestRunConfig';
+import { RootState } from '../../../reducers';
+import { WSConnectionInfo } from '../../../../shared/models/WSConnectionInfo';
 
 ​const mapStateToProps = (state:RootState) => {
   return {

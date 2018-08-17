@@ -2,9 +2,9 @@ import * as React from 'react';
 import './TestRunForm.scss';
 import * as _ from 'lodash';
 import { Formik } from 'formik';
-import { TestRunConfig } from '../../../shared/models/TestRunConfig';
-import { WSConnectionInfo } from '../../../shared/models/WSConnectionInfo';
-import FormikCheckbox from '../form/FormikCheckbox';
+import { TestRunConfig } from '../../../../shared/models/TestRunConfig';
+import { WSConnectionInfo } from '../../../../shared/models/WSConnectionInfo';
+import FormikCheckbox from '../../form/FormikCheckbox';
 import Tooltip from 'rc-tooltip';
 import 'rc-tooltip/assets/bootstrap_white.css';
 
@@ -84,7 +84,7 @@ export class TestRunForm extends React.Component<TestRunFormProps, any> {
                 <Formik
                         initialValues={{
                           remoteConnect: false,
-                          testDirPath: '/Users/212589146/dev/busybee/busybee/test/IT/fixtures/REST-multi-env',
+                          testDirPath: '/Users/212589146/dev/busybee/busybee/test/IT/fixtures/mixed-test-suite-type',
                           wsHost: `${this.props.defaultHost}`,
                           wsPort: `${this.props.defaultWsPort}`   
                         }}

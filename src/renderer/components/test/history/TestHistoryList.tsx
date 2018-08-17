@@ -1,20 +1,23 @@
 import * as React from 'react';
-import './TestRunHistoryList.scss';
+import './TestHistoryList.scss';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { TestRunStatusEntity } from '../../entities/TestRunStatusEntity';
+import { TestRunStatusEntity } from '../../../entities/TestRunStatusEntity';
 
-interface TestRunHistoryListProps {
+interface TestHistoryListProps {
     fetchTestRunHistory: () => void,
     setCurrentTestRunId: (runId:string) => void,
-    testRunHistory: TestRunStatusEntity[]
+    testRunHistory: TestRunStatusEntity[] | null
 }
 
-export class TestRunHistoryList extends React.Component<TestRunHistoryListProps, any> {
+export class TestHistoryList extends React.Component<TestHistoryListProps, any> {
     
     componentDidMount() {
-        this.props.fetchTestRunHistory();
+        if (!this.props.testRunHistory) {
+            this.props.fetchTestRunHistory();
+        }   
     }
+    
     render() {
         const LIs = _.map(this.props.testRunHistory, (rh, i) => {
             return (

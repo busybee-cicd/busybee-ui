@@ -1,16 +1,18 @@
 import * as React from 'react';
 import './TestRunView.scss';
-import TestRunHistoryListContainer from '../../containers/test/TestRunHistoryListContainer';
+import TestHistoryListContainer from '../../../containers/test/history/TestHistoryListContainer';
 import { SyncLoader } from 'react-spinners';
 import Slider, { createSliderWithTooltip } from 'rc-slider';
 import TestRunTree from './TestRunTree';
 import 'rc-slider/assets/index.css';
 import * as moment from 'moment';
 import * as classNames from 'classnames';
-import TestRunFormContainer from '../../containers/test/TestRunFormContainer';
+import TestRunFormContainer from '../../../containers/test/run/TestRunFormContainer';
+import { NavLocation } from '../../../../shared/enums/NavLocation';
 
 interface TestRunViewProps {
     cancelTest: () => void,
+    navigate: (loc:NavLocation) => void,
     setCurrentTestRunId: (runId: string | null) => void,
     setTestRunViewSliderIndex: (index:number) => void,
     runData: AnyOfArrays,
@@ -30,36 +32,58 @@ export default class TestRunView extends React.Component<TestRunViewProps, any> 
         return moment(ts).format('MMMM DD YYYY, h:mm:ss a')
     }
 
+    getNewRunNavItem():JSX.Element|void {
+        if (!this.props.isRunning) {
+            return (
+                <button 
+                    onClick={this.props.setCurrentTestRunId.bind(this, null)} 
+                    className='subnav-item btn btn-primary'>
+                    New Test Run
+                </button>
+            ) 
+        }   
+    }
+
+    getCancelNavItem():JSX.Element|void {
+        if (this.props.isRunning) {
+            const message = this.props.remoteConnect ? 'Disconnect' : 'Cancel';
+            return (
+                <button 
+                    onClick={this.props.cancelTest.bind(this)} 
+                    className='subnav-item btn btn-negative'>
+                    {message}
+                </button>
+            )
+        }   
+}
+
+    getViewResultNavItem():JSX.Element|void {
+        if (!this.props.isRunning) {
+            return (
+                <button 
+                    onClick={this.props.navigate.bind(this, NavLocation.TEST_RESULTS)} 
+                    className='subnav-item btn btn-primary'>
+                    View Result
+                </button>
+            )
+        }   
+    }
+
     getTestViewNav() {
         if (this.props.runId === null) return;
 
-        let testViewNavClasses = classNames('subnav-item', {
-            btn: true,
-            'btn-primary': !this.props.isRunning,
-            'btn-negative': this.props.isRunning     
-        });
-
-        let runOrCancelAction:any = this.props.isRunning ?
-            this.props.cancelTest
-            : () => (this.props.setCurrentTestRunId(null))
-
-        
-        let message;
-        if (this.props.isRunning) {
-            message = this.props.remoteConnect ?
-                'Disconnect'
-                : 'Cancel';
-        } else {
-            message = 'New Test Run';
-        }
+        const newRun = this.getNewRunNavItem();
+        const cancel = this.getCancelNavItem();
+        const viewResult = this.getViewResultNavItem();
 
         return (
             <div className='d-flex flex-row-reverse'>
-                <button onClick={runOrCancelAction.bind(this)} className={testViewNavClasses}>{message}</button>
+                {newRun}
+                {cancel}
+                {viewResult}
             </div>
         )
     }
-
 
     render() {
         let Content;
@@ -72,7 +96,7 @@ export default class TestRunView extends React.Component<TestRunViewProps, any> 
                 <div className='d-flex h-100 justify-content-center align-items-center'>
                     {LoadingOrForm}
                 </div>
-            )
+            );
         } else {
             const dataArr = this.props.runData[this.props.runId];
             const totalSteps = dataArr.length;
@@ -117,7 +141,7 @@ export default class TestRunView extends React.Component<TestRunViewProps, any> 
                 <div className="pane-group">
                     <div className="pane-sm sidebar">
                         <div className="text-center"><b>Test Run History</b></div>
-                        <TestRunHistoryListContainer />
+                        <TestHistoryListContainer />
                     </div>
                     <div className="pane d-flex flex-column">
                         {this.getTestViewNav()}

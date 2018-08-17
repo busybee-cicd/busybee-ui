@@ -1,8 +1,9 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm';
 import { BusybeeMessageI } from '../../shared/models/BusybeeMessageI';
+import { BusybeeTestResults } from '../../../../busybee-result-react/dist';
  
 @Entity()
-export class TestRunResultEntity {
+export class TestRunResultsEntity {
  
     @PrimaryGeneratedColumn()
     id!: number;
@@ -17,7 +18,7 @@ export class TestRunResultEntity {
     runId!: string
  
     @Column("simple-json")
-    data!: any
+    data!: BusybeeTestResults
     
     constructor(msg:BusybeeMessageI) {
       if (!msg) { return }

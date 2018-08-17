@@ -1,28 +1,25 @@
 import { connect } from 'react-redux'
-import { Root } from '../components/Root'
 import { Actions } from '../actions';
 import { ThunkDispatch } from 'redux-thunk';
 import { NavLocation } from '../../shared/enums/NavLocation';
 import { RootState } from '../reducers';
+import { ToolBar } from '../components/ToolBar';
 
 ​const mapStateToProps = (state:RootState) => {
   return {
-    db: state.app.db,
+    runId: state.testRun.currentRunId,
     navLocation: state.app.currentNavLocation,
-    toast: state.toast.message
   }
 }
 ​
 const mapDispatchToProps = (dispatch:ThunkDispatch<any,any,any>) => {
   return {
-    fetchDb: () => dispatch(Actions.app.fetchDb()),
-    listenForBusybeeMessages: () => dispatch(Actions.app.listenForIpcMessages()),
     navigate: (navLocation:NavLocation) => dispatch(Actions.app.navigate(navLocation)),
-    dismissToast: () =>  dispatch(Actions.toast.dismiss())
+    setCurrentTestRunId: (runId: string|null) => dispatch(Actions.testRun.setCurrentTestRunId(runId)),
   }
 }
 ​
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(Root)
+)(ToolBar)

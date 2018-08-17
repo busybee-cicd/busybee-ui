@@ -5,7 +5,7 @@ import { TestRunStatusEntity } from "../entities/TestRunStatusEntity";
 export interface TestRunState extends State {
     currentRunId: string | null,
     sliderIndex: number,
-    history: any[],
+    history: any[] | null,
     timeSeriesData: AnyOfArrays,
     defaultHost: string,
     defaultWsPort: number,
@@ -18,7 +18,7 @@ let initialTSTestRunData:AnyOfArrays = {};
 const initialState:TestRunState = {
     currentRunId: null,
     sliderIndex: 0,
-    history: [],
+    history: null,
     isRunning: false,
     timeSeriesData : initialTSTestRunData,
     defaultHost: '127.0.0.1',
@@ -53,9 +53,6 @@ export default (state:TestRunState = initialState, action:ReducerAction):TestRun
             }
 
             return set(state, updateState);
-        case ActionTypes.testRun.TEST_RUN_RESULT_RECIEVED:
-            console.log('TEST_RUN_RESULT_RECIEVED')
-            return state;
         case ActionTypes.testRun.SET_TIME_SERIES_RUN_DATA:
             return set(state, {timeSeriesData: action.payload});
         case ActionTypes.testRun.TEST_RUN_HISTORY_RECIEVED:

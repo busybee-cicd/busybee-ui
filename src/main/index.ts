@@ -4,7 +4,7 @@ import { app, BrowserWindow, Event, ipcMain } from 'electron'
 import * as path from 'path'
 import { format as   formatUrl } from 'url'
 import SQL from 'sql.js';
-import { IpcMessageType } from '../shared/constants/IpcMessageType';
+import { IpcMessageType } from '../shared/constants/IPCMessageType';
 import * as fs from 'fs-extra';
 import * as WebSocket from 'ws';
 import { WSConnectionInfo } from '../shared/models/WSConnectionInfo';
@@ -86,7 +86,7 @@ app.on('ready', () => {
  */
 const databaseDir = path.join(app.getPath('userData'), 'databases')
 fs.mkdirsSync(databaseDir);
-const databaseFilePath = path.join(databaseDir, 'starter.db');
+const databaseFilePath = path.join(databaseDir, 'busybee-ui.db');
 
 ipcMain.on(IpcMessageType.GET_DB_FILE, async (event:Event) => {
 
