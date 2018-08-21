@@ -5,6 +5,7 @@ export class IpcMessageType {
   static readonly RUN_BUSYBEE_TEST = 'RUN_BUSYBEE_TEST';
   static readonly CANCEL_BUSYBEE_TEST = 'CANCEL_BUSYBEE_TEST';
   static readonly BUSYBEE_MSG = 'BUSYBEE_MSG';
+  static readonly BUSYBEE_LOG_MSG = 'BUSYBEE_LOG_MSG';
   static readonly WS_CLIENT_INIT = 'WS_CLIENT_INIT';
   static readonly WS_CLIENT_ERROR = 'WS_CLIENT_ERROR';
   static readonly WS_CLIENT_CLOSED = 'WS_CLIENT_CLOSED';

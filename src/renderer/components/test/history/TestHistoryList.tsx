@@ -21,7 +21,7 @@ export class TestHistoryList extends React.Component<TestHistoryListProps, any> 
     render() {
         const LIs = _.map(this.props.testRunHistory, (rh, i) => {
             return (
-             <li className="list-group-header" key={i} onClick={this.props.setCurrentTestRunId.bind(this, rh.runId)}>
+             <li className="list-group-item" key={i} onClick={this.props.setCurrentTestRunId.bind(this, rh.runId)}>
                  {moment(rh.runTimestamp).format('MMMM DD YYYY, h:mm:ss a')}
              </li>
             ) 

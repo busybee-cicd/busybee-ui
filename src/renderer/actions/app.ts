@@ -18,6 +18,8 @@ export class AppActionTypes {
   static readonly DB_READY = 'DB_READY'; 
   static readonly NAVIGATE = 'NAVIGATE';
   static readonly BUSYBEE_MESSAGE_RECIEVED = 'BUSYBEE_MESSAGE_RECIEVED';
+  static readonly APPEND_LOG = 'APPEND_LOG';
+  static readonly CLEAR_LOG = 'CLEAR_LOG';
 }
 
 const entities = [
@@ -26,6 +28,19 @@ const entities = [
 ];
 
 export default class AppActions {
+
+    static appendLog(msg:string) {
+        return {
+            type: AppActionTypes.APPEND_LOG,
+            payload: msg
+        }
+    }
+
+    static clearLog() {
+        return {
+            type: AppActionTypes.CLEAR_LOG
+        }
+    }
     
     static fetchDb() {
         return (dispatch:Dispatch<AnyAction>) => {  
@@ -106,6 +121,10 @@ export default class AppActions {
             ipcRenderer.on(IpcMessageType.WS_CLIENT_ERROR, (event:any, message:string) => {
                 dispatch(TestRunActions.setIsRunning(false));
                 dispatch(ToastActions.error(message));
+            });
+
+            ipcRenderer.on(IpcMessageType.BUSYBEE_LOG_MSG, (event:any, message:string) => {
+                dispatch(AppActions.appendLog(message));
             });
         }
     }

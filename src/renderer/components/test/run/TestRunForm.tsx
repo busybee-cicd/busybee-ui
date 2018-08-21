@@ -84,7 +84,7 @@ export class TestRunForm extends React.Component<TestRunFormProps, any> {
                 <Formik
                         initialValues={{
                           remoteConnect: false,
-                          testDirPath: '/Users/212589146/dev/busybee/busybee/test/IT/fixtures/mixed-test-suite-type',
+                          testDirPath: '',
                           wsHost: `${this.props.defaultHost}`,
                           wsPort: `${this.props.defaultWsPort}`   
                         }}

@@ -11,21 +11,30 @@ import { WSConnectionInfo } from '../shared/models/WSConnectionInfo';
 import { TestRunConfig } from '../shared/models/TestRunConfig';
 import { spawn, ChildProcess } from 'child_process';
 import { IOUtil, Logger, LoggerConf } from 'busybee-util';
+// require('shell-path').sync();
+require('fix-path')();
+const isDevelopment = process.env.NODE_ENV !== 'production'
 
+// global reference to mainWindow (necessary to prevent window from being garbage collected)
+let mainWindow:BrowserWindow|null;
+const logLevel = process.env.LOG_LEVEL || 'INFO';
+let logCb = null;
+if (logLevel === 'DEBUG ' && !isDevelopment) {
+  logCb = (msg:string) => {
+    if (mainWindow)
+      mainWindow.webContents.send(IpcMessageType.BUSYBEE_LOG_MSG, msg);
+  }
+}
 const loggerConf = new LoggerConf(
   {
     constructor: {
       name: 'MainProcess'
     }
   },
-  process.env['LOG_LEVEL'] || 'INFO',
-  null
+  logLevel,
+  logCb
 );
 const logger = new Logger(loggerConf);
-const isDevelopment = process.env.NODE_ENV !== 'production'
-
-// global reference to mainWindow (necessary to prevent window from being garbage collected)
-let mainWindow:BrowserWindow|null;
 
 function createMainWindow() {
   const window = new BrowserWindow({titleBarStyle: 'hidden'});
@@ -33,12 +42,8 @@ function createMainWindow() {
 
   if (isDevelopment) {
     window.webContents.openDevTools()
-  }
-
-  if (isDevelopment) {
-    window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
-  }
-  else {
+    window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`);
+  } else {
     window.loadURL(formatUrl({
       pathname: path.join(__dirname, 'index.html'),
       protocol: 'file',
@@ -55,7 +60,11 @@ function createMainWindow() {
     setImmediate(() => {
       window.focus()
     })
-  })
+  });
+
+  console.log(process.env['LOG_LEVEL']);
+  console.log(isDevelopment ? 'isDev' : 'production!')
+  window.webContents.send(IpcMessageType.BUSYBEE_LOG_MSG, isDevelopment ? 'isDev' : 'production!');
 
   return window
 }
@@ -180,10 +189,16 @@ function initWs(connectionInfo:WSConnectionInfo|null): WebSocket {
 
 let runCmd:ChildProcess | null;
 function busybeeTest(runConfig:TestRunConfig) {
-  logger.debug('busybeeTest')
+  logger.debug('busybeeTest');
+  console.log(process.env.PATH)
   // run busybee
-  runCmd = spawn('busybee', ['test', '-d', runConfig.dirPath, '-w', `${runConfig.wsConnectionInfo.port}`]);
-  
+  let spawnOpts = {
+    env: {
+      PATH: process.env.PATH
+    }
+  }
+  runCmd = spawn('busybee', ['test', '-d', runConfig.dirPath, '-w', `${runConfig.wsConnectionInfo.port}`], spawnOpts);
+
   runCmd.stderr.on('data', (data) => {
     if (!runCmd) return;
     logger.debug('error recieved');
@@ -196,7 +211,7 @@ function busybeeTest(runConfig:TestRunConfig) {
     let lines = IOUtil.parseDataBuffer(data);
     lines.forEach((l) => {
       logger.debug(l);
-      if (l.startsWith(`INFO:TestWebSocketServer: wss running at ${runConfig.wsConnectionInfo.port}`)) {
+      if (l.indexOf(`wss running at ${runConfig.wsConnectionInfo.port}`) !== -1) {
         initWs(runConfig.wsConnectionInfo);
       }
     })

@@ -1,14 +1,15 @@
 import * as React from 'react';
-import './Root.scss';
 import { SyncLoader } from 'react-spinners';
-import { Connection } from 'typeorm';
-import TestRunViewContainer from '../containers/test/run/TestRunViewContainer';
-import { NavLocation } from '../../shared/enums/NavLocation';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Connection } from 'typeorm';
+import { NavLocation } from '../../shared/enums/NavLocation';
 import { ToastMessageI } from '../../shared/models/ToastMessageI';
-import ToolbarContainer from '../containers/ToolbarContainer';
+import LogConsoleContainer from '../containers/LogConsoleContainer';
 import TestResultsViewContainer from '../containers/test/results/TestResultsViewContainer';
+import TestRunViewContainer from '../containers/test/run/TestRunViewContainer';
+import ToolbarContainer from '../containers/ToolbarContainer';
+import './Root.scss';
 // import ToolbarContainer from '../containers/ToolbarContainer';
 
 interface RootProps {
@@ -58,6 +59,9 @@ export class Root extends React.Component<RootProps, any> {
                     break;
                 case NavLocation.TEST_RESULTS:
                     Content = <TestResultsViewContainer />
+                    break;
+                case NavLocation.LOG_CONSOLE:
+                    Content = <LogConsoleContainer />
                     break;
                 default:
                     break;

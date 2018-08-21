@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 interface ToolBarProps {
     navLocation:NavLocation,
+    log: string[],
     navigate: (state:NavLocation) => void,
     setCurrentTestRunId: (runId: string|null) => void
 }
@@ -46,6 +47,23 @@ export class ToolBar extends React.Component<ToolBarProps, any> {
             </button>
         );
     }
+
+    getLogConsoleNav() {
+        if (this.props.log.length < 1) return;
+
+        const onClick = (navLocation:NavLocation, e:MouseEvent) => {
+            this.handleNavigate(navLocation, e);
+        };
+
+        let classes = classNames('btn btn-default', {'active': this.props.navLocation === NavLocation.LOG_CONSOLE});
+
+        return  (
+            <button className={classes} onClick={onClick.bind(this, NavLocation.LOG_CONSOLE)}>
+                <span className="icon icon-info-circled icon-text"></span>
+               Logs
+            </button>
+        );
+    }
     
     render(): any {
         return(
@@ -53,6 +71,7 @@ export class ToolBar extends React.Component<ToolBarProps, any> {
                 <div className='btn-group pull-right'>
                     {this.getRunTestNav()}
                     {this.getRunTestResultsNav()}
+                    {this.getLogConsoleNav()}
                 </div>
             </div>
         )
