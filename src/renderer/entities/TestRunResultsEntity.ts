@@ -1,6 +1,6 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm';
 import { BusybeeMessageI } from '../../shared/models/BusybeeMessageI';
-import { BusybeeTestResults } from '../../../../busybee-result-react/dist';
+import { BusybeeTestResults } from 'busybee-results-react';
  
 @Entity()
 export class TestRunResultsEntity {

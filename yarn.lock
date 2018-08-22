@@ -698,10 +698,6 @@
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/@types/classnames/-/classnames-2.2.6.tgz#dbe8a666156d556ed018e15a4c65f08937c3f628"
 
-"@types/electron-util@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@types/electron-util/-/electron-util-0.2.0.tgz#a15854ded5fdcf4215f4e7cdebb010875340f06e"
-
 "@types/events@*":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@types/events/-/events-1.2.0.tgz#81a6731ce4df43619e5c8c945383b3e62a89ea86"
@@ -8271,7 +8267,7 @@ shell-env@^0.3.0:
     execa "^0.5.0"
     strip-ansi "^3.0.0"
 
-shell-path@^2.0.0, shell-path@^2.1.0:
+shell-path@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/shell-path/-/shell-path-2.1.0.tgz#ea7d06ae1070874a1bac5c65bb9bdd62e4f67a38"
   dependencies:

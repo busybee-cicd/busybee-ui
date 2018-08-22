@@ -2,7 +2,8 @@ import * as React from 'react';
 import './TestResultsView.scss';
 import TestHistoryListContainer from '../../../containers/test/history/TestHistoryListContainer';
 import { SyncLoader } from 'react-spinners';
-import BusybeeTestResultsComponent, { BusybeeTestResults } from '../../../../../../busybee-result-react/dist';
+require('bootstrap/dist/css/bootstrap.min.css');
+import BusybeeTestResultsComponent, { BusybeeTestResults } from 'busybee-results-react';
 import { TestRunStatusEntity } from '../../../entities/TestRunStatusEntity';
 
 interface TestResultsViewProps {
