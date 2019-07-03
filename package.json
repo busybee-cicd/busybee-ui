@@ -19,7 +19,7 @@
     "bluebird": "^3.5.1",
     "bootstrap": "^4.1.3",
     "busybee": "https://github.com/busybee-cicd/busybee.git",
-    "busybee-results-react": "git://github.com/busybee-cicd/busybee-results-react.git",
+    "busybee-results-react": "https://github.com/busybee-cicd/busybee-results-react.git",
     "busybee-util": "https://github.com/busybee-cicd/busybee-util.git",
     "classnames": "^2.2.6",
     "electron-util": "^0.9.0",
