@@ -1,11 +1,11 @@
 {
   "name": "busybee-ui",
-  "description": "A UI client for the Busybee cmd-line tool",
+  "description": "A native UI client for the Busybee cmd-line tool",
   "author": "Simon Townsend",
   "version": "0.0.1",
   "license": "MIT",
   "build": {
-    "appId": "com.ge.busybee-ui"
+    "appId": "com.github.busybee-ui"
   },
   "scripts": {
     "cleanDb": "rm -rf ~/Library/Application\\ Support/Electron/databases/busybee-ui.db",
@@ -18,9 +18,9 @@
     "@types/fs-extra": "^5.0.4",
     "bluebird": "^3.5.1",
     "bootstrap": "^4.1.3",
-    "busybee": "https://github.build.ge.com/Busybee/busybee.git",
-    "busybee-results-react": "git://github.build.ge.com/Busybee/busybee-results-react.git",
-    "busybee-util": "https://github.build.ge.com/Busybee/busybee-util.git",
+    "busybee": "https://github.com/busybee-cicd/busybee.git",
+    "busybee-results-react": "git://github.com/busybee-cicd/busybee-results-react.git",
+    "busybee-util": "https://github.com/busybee-cicd/busybee-util.git",
     "classnames": "^2.2.6",
     "electron-util": "^0.9.0",
     "fix-path": "^2.1.0",

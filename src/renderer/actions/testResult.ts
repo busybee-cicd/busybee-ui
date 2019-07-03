@@ -2,7 +2,7 @@ import { Dispatch, AnyAction } from "redux";
 import { TestRunResultsEntity } from '../entities/TestRunResultsEntity';
 import { Repository } from "typeorm";
 import { RootState } from "../reducers";
-import { BusybeeTestResults } from "../../../../busybee-result-react/dist";
+import { BusybeeTestResults } from "busybee-results-react";
 
 export class TestResultActionTypes {
     static readonly TEST_RESULTS_RECIEVED = 'TEST_RESULTS_RECIEVED'; 

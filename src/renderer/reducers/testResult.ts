@@ -1,6 +1,6 @@
 import { State, ReducerAction, set } from ".";
 import { ActionTypes } from "../actions";
-import { BusybeeTestResults } from "../../../../busybee-result-react/dist";
+import { BusybeeTestResults } from "busybee-results-react";
 
 export interface TestResultState extends State {
     currentTestResults: BusybeeTestResults | null;
